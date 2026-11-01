@@ -23,7 +23,11 @@
    dann nur Plum, wenn ihre Methode offen ist. Ohne das Attribut wie bisher: Punkte der übrigen Methoden treten zurück.
 
    Ab 1.26.0 (Entscheid 396): data-linien="laufen" am Behälter lässt die Linien von den Methoden zum Ergebnis-Kasten
-   dauernd als Punktlinie laufen (Richtung Kasten). Die Linie der offenen Methode ist Plum, die übrigen Sea Cliff. */
+   dauernd als Punktlinie laufen (Richtung Kasten). Die Linie der offenen Methode ist Plum, die übrigen Sea Cliff.
+
+   Ab 1.29.0 (Entscheid 403): data-start="zu" am Behälter beginnt mit allen Methoden zugeklappt (ohne das Attribut wie
+   bisher: die erste offen). Ein Klick irgendwo in das Feld einer Methode (methode_zeile) öffnet sie, nicht nur auf den
+   Titel. Bei einer offenen Methode schliesst ein Klick auf den Kopf; Klicks in ihren Inhalt (Text, Links) schliessen nicht. */
 import { clamp, zahl, takt } from './util.js';
 
 const CSS = `
@@ -170,6 +174,7 @@ export function methoden(el, art) {
 /* ---------- Aufklappbare Methoden (methoden-klapp) ---------- */
 const CSS_KLAPP = `
 .rg-mk .methode_kopf{cursor:pointer;position:relative;padding-right:2.5rem}
+.rg-mk .methode_zeile:not(.rg-offen){cursor:pointer}
 .rg-mk-knopf{all:unset;cursor:pointer;display:inline;font:inherit;color:inherit;letter-spacing:inherit}
 .rg-mk-knopf:focus-visible{outline:2px solid #AA1351;outline-offset:4px;border-radius:2px}
 .rg-mk-plus{position:absolute;right:0;top:50%;width:1rem;height:1rem;margin-top:-.5rem;pointer-events:none}
@@ -300,7 +305,13 @@ function klapp(el) {
 
   teile.forEach((t, k) => {
     t.knopf.addEventListener('click', e => { e.stopPropagation(); setzen(offenK === k ? -1 : k); });
-    if (t.kopf) t.kopf.addEventListener('click', () => t.knopf.click());
+    /* ganzes Feld klickbar (1.29.0); Inhalt der offenen Methode und Links darin schliessen nicht */
+    t.z.addEventListener('click', e => {
+      if (e.target.closest('a,button,input,select,textarea,label')) return;
+      if (offenK === k && t.huelle.contains(e.target)) return;
+      if (window.getSelection && String(window.getSelection()).length > 0) return;
+      t.knopf.click();
+    });
     t.z.addEventListener('mouseenter', () => pfade[k] && pfade[k].classList.add('rg-hl'));
     t.z.addEventListener('mouseleave', () => pfade[k] && k !== offenK && pfade[k].classList.remove('rg-hl'));
   });
@@ -320,9 +331,17 @@ function klapp(el) {
   });
   el.addEventListener('mouseleave', () => clearTimeout(wartet));
 
-  /* Start: alle zu ohne Bewegung, dann die erste offen */
+  /* Start: alle zu ohne Bewegung, dann die erste offen (data-start="zu": alle bleiben zu) */
   teile.forEach(t => { t.huelle.style.height = '0px'; });
-  ruhigStart();
+  if ((el.getAttribute('data-start') || '').toLowerCase() === 'zu') alleZu();
+  else ruhigStart();
+  function alleZu() {
+    offenK = -1;
+    el.classList.add('rg-mk-zu');
+    teile.forEach(x => { x.z.classList.remove('rg-offen'); x.knopf.setAttribute('aria-expanded', 'false'); });
+    punkte.forEach(p => p.classList.add('rg-an'));
+    zeichnen();
+  }
   function ruhigStart() {
     const t = teile[0];
     offenK = 0;
