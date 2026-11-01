@@ -78,8 +78,12 @@ Prüfwerkzeuge: `pruefung/messen.js` (Ladezeit, Datenmenge), `pruefung/rechenlas
 - Jede Grafik baut sich einmal auf und ruht dann. Dauerhaft bewegt sind nur das Punktemeer (Header, Footer) und die Kugel mit den Kacheln, alle langsam und nie gleichzeitig im Bild.
 - Kein Scroll-Halt und kein Farbfluss. Ausnahme Themenlinien (Entscheid ROWAPA, Runde 20): Auf Seiten mit dieser Section scrollt die Seite ab 992 px weich (Lenis) und rastet in der Section auf die Themen ein, wie die Referenz. Bei «Bewegung reduzieren» und auf Tablet und Handy bleibt das Scrollen normal. Zweite Ausnahme (Entscheid 368, ab 1.19.0): «Fünf Methoden» der Performance-Analyse steht ab 992 px für fünf kurze Schritte (je 190 px), ohne Lenis.
 - Die einzige Einblendung der Startseite ist die Farbfläche im Blickpunkt (CAS); sie ist eine native Webflow-Interaction, nicht Teil dieses Skripts. Ebenso nativ: Titel-Strich und Team-Kacheln nacheinander.
-- Start erst nach dem Laden der Seite; jede Grafik rechnet nur, solange sie sichtbar ist. Ab 1.27.0 warten die Grafiken zusätzlich, solange die Seite im Hintergrund vorgeladen wird oder beim Seitenwechsel noch einfährt (`html[data-rg-wechsel]`, gesetzt vom Kopf-Skript «ROWAPASeitenwechsel» ab 1.1.0 in den Fassungen «neu» und «kurz»); bis dahin stehen die Standbilder.
+- Start erst nach dem Laden der Seite; jede Grafik rechnet nur, solange sie sichtbar ist. Ab 1.27.0 warten die Grafiken zusätzlich, solange die Seite im Hintergrund vorgeladen wird oder beim Seitenwechsel noch einfährt (`html[data-rg-wechsel]`, gesetzt vom Kopf-Skript «ROWAPASeitenwechsel» ab 1.1.0, ab 1.2.0 bei jedem Seitenwechsel); bis dahin stehen die Standbilder.
 - Werkzeuge zum Neuerzeugen der Standbilder (Punktfiguren, Treppe, Kugel, Symbole): Ordner [`figuren/`](figuren/LIESMICH.md).
+
+## 1.28.0 (01.11.2026)
+
+- `punktfigur` mit `data-start="sofort"` (Lupe im Header der Unterseiten): Kommt die Seite über den Seitenwechsel (`html[data-rg-angekommen]`, Kopf-Skript ab 1.2.0), bleibt die Figur als Standbild stehen und baut sich nicht erneut auf. Beim direkten Aufruf der Seite baut sie sich wie bisher auf. Entscheid 398: Seitenwechsel in alle Richtungen gleich.
 
 ## 1.27.0 (01.11.2026)
 

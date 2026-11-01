@@ -30,6 +30,9 @@ export function figur(box) {
      ausser data-start="sofort" (z. B. Lupe im Header der Unterseiten, ab 1.19.0) */
   const sofort = (box.getAttribute('data-start') || '').trim().toLowerCase() === 'sofort';
   const zeige = () => { img.style.opacity = sofort ? '1' : ''; };
+  /* ab 1.28.0: Kommt die Seite über den Seitenwechsel (html[data-rg-angekommen], Kopf-Skript ab 1.2.0), ist sie schon
+     vollständig eingefahren; die Figur bleibt dann als Standbild stehen und baut sich nicht noch einmal auf */
+  if (sofort && document.documentElement.hasAttribute('data-rg-angekommen')) { zeige(); return; }
   if (!/\.png(\?|\s|$)/i.test(img.getAttribute('src') || '')) { if (sofort) zeige(); return; }
   const r0 = box.getBoundingClientRect();
   if (!sofort && r0.top < innerHeight && r0.bottom > 0) return;

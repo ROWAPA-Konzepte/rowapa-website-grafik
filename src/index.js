@@ -47,10 +47,10 @@ function start() {
   });
 }
 
-/* Seitenwechsel (Kopf-Skript «ROWAPASeitenwechsel» ab 1.1.0, Fassungen «neu» und «kurz»): Solange die Seite im Hintergrund
+/* Seitenwechsel (Kopf-Skript «ROWAPASeitenwechsel» ab 1.1.0; ab 1.2.0 immer): Solange die Seite im Hintergrund
    vorgeladen wird (document.prerendering) oder beim Seitenwechsel noch einfährt (html[data-rg-wechsel]), warten die Grafiken;
    bis dahin stehen die Standbilder. So muss der Browser während des Einfahrens nichts anderes rechnen. Ohne dieses Attribut
-   (Fassung «heute») startet alles wie bisher. */
+   (direkter Aufruf, Seitenwechsel 1.0.0) startet alles wie bisher. */
 function nachWechsel(f) {
   if (document.prerendering) {
     let weiter = false;
