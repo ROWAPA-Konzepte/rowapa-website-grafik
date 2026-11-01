@@ -27,7 +27,9 @@
 
    Ab 1.29.0 (Entscheid 403): data-start="zu" am Behälter beginnt mit allen Methoden zugeklappt (ohne das Attribut wie
    bisher: die erste offen). Ein Klick irgendwo in das Feld einer Methode (methode_zeile) öffnet sie, nicht nur auf den
-   Titel. Bei einer offenen Methode schliesst ein Klick auf den Kopf; Klicks in ihren Inhalt (Text, Links) schliessen nicht. */
+   Titel. Bei einer offenen Methode schliesst ein Klick auf den Kopf; Klicks in ihren Inhalt (Text, Links) schliessen nicht.
+   Ab 1.29.1: Der eigene Zeiger zeigt den Klick-Zustand über dem ganzen Feld einer zugeklappten Methode und über dem Kopf
+   der offenen (Attribut data-zeiger-klick, gesetzt vom Skript). */
 import { clamp, zahl, takt } from './util.js';
 
 const CSS = `
@@ -297,10 +299,20 @@ function klapp(el) {
         requestAnimationFrame(() => { t.huelle.style.height = '0px'; });
       }
     });
+    zeigerZiele();
     const an = new Set(k >= 0 ? karte[k] : []);
     punkte.forEach((p, i) => p.classList.toggle('rg-an', k < 0 || an.has(i)));
     bis = performance.now() + 700;
     requestAnimationFrame(mitfuehren);
+  }
+
+  /* Eigener Zeiger: Klick-Zustand über dem ganzen Feld der zugeklappten Methoden und dem Kopf der offenen (1.29.1) */
+  function zeigerZiele() {
+    teile.forEach((t, i) => {
+      const auf = i === offenK;
+      t.z.toggleAttribute('data-zeiger-klick', !auf);
+      if (t.kopf) t.kopf.toggleAttribute('data-zeiger-klick', auf);
+    });
   }
 
   teile.forEach((t, k) => {
@@ -340,6 +352,7 @@ function klapp(el) {
     el.classList.add('rg-mk-zu');
     teile.forEach(x => { x.z.classList.remove('rg-offen'); x.knopf.setAttribute('aria-expanded', 'false'); });
     punkte.forEach(p => p.classList.add('rg-an'));
+    zeigerZiele();
     zeichnen();
   }
   function ruhigStart() {
@@ -349,6 +362,7 @@ function klapp(el) {
     t.huelle.style.height = 'auto';
     const an = new Set(karte[0]);
     punkte.forEach((p, i) => p.classList.toggle('rg-an', an.has(i)));
+    zeigerZiele();
     zeichnen();
   }
   addEventListener('resize', zeichnen);

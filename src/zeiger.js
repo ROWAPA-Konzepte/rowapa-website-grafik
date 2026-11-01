@@ -6,7 +6,8 @@
    In Formularfeldern bleibt der normale Cursor.
    Ab 1.20.0 läuft der Ring 1:1 mit der Maus, ohne Nachziehen (Entscheid 383). Wer wieder einen Nachlauf möchte:
    data-zeiger-nachlauf="0.8" am selben Element (0 = direkt, Standard; bis 0.95 = stark verzögert). Bei «Bewegung reduzieren»
-   immer direkt. */
+   immer direkt.
+   Ab 1.29.1 wächst der Ring auch über Elementen mit data-zeiger-klick (z. B. das ganze Feld einer zugeklappten Methode). */
 import { reduziert, ciFarbe, beiMaus, clamp } from './util.js';
 
 let laeuft = false;
@@ -63,7 +64,7 @@ function starten(el) {
     let ring = gr === 'hell' ? dunkelblau : 'rgba(255,255,255,.92)';
     kreis.style.boxShadow = gr === 'bild' ? '0 0 0 1px rgba(17,29,44,.28), inset 0 0 0 1px rgba(17,29,44,.28)' : 'none';
     if (v === 'b') {
-      const ziel = t && t.closest && t.closest('a, button, [role="button"], .card, label');
+      const ziel = t && t.closest && t.closest('a, button, [role="button"], .card, label, [data-zeiger-klick]');
       if (ziel) { g = 72; fuell = plum; ring = plum; label = ziel.getAttribute('data-zeiger-text') || (ziel.matches('.card, a') ? 'Öffnen' : ''); farbePunkt = 'transparent'; }
       else if (t && t.closest && t.closest('p, h1, h2, h3, h4, li')) g = 22;
     }
