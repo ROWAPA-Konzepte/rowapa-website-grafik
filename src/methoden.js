@@ -20,7 +20,10 @@
 
    Ab 1.25.0 (Entscheid 395): data-ergebnis="marke" am Behälter lässt im Ergebnis-Kasten alle Punkte voll sichtbar;
    nur die Marke (methode_panel-marke) der Punkte der offenen Methode wird Plum. Auch die feste Plum-Marke (is-plum) ist
-   dann nur Plum, wenn ihre Methode offen ist. Ohne das Attribut wie bisher: Punkte der übrigen Methoden treten zurück. */
+   dann nur Plum, wenn ihre Methode offen ist. Ohne das Attribut wie bisher: Punkte der übrigen Methoden treten zurück.
+
+   Ab 1.26.0 (Entscheid 396): data-linien="laufen" am Behälter lässt die Linien von den Methoden zum Ergebnis-Kasten
+   dauernd als Punktlinie laufen (Richtung Kasten). Die Linie der offenen Methode ist Plum, die übrigen Sea Cliff. */
 import { clamp, zahl, takt } from './util.js';
 
 const CSS = `
@@ -179,10 +182,14 @@ const CSS_KLAPP = `
 .rg-mk .methode_zeile.rg-offen{border-left-color:#AA1351}
 .rg-mk .methode_panel-punkt{transition:opacity .35s}
 .rg-mk .methode_panel-punkt:not(.rg-an){opacity:.3}
+[data-linien="laufen"] .rg-m-linien path.rg-w{stroke-dasharray:.1 9;stroke-linecap:round;stroke-width:3;animation:rgLauf 1.1s linear infinite}
+[data-linien="laufen"] .rg-m-linien path.rg-otj:not(.rg-hl){stroke:#A0C4DF}
+[data-linien="laufen"] .rg-m-linien path.rg-w.rg-hl{stroke-width:4}
+@keyframes rgLauf{from{stroke-dashoffset:9.1}to{stroke-dashoffset:0}}
 [data-ergebnis="marke"].rg-mk .methode_panel-punkt:not(.rg-an){opacity:1}
 [data-ergebnis="marke"].rg-mk .methode_panel-marke{background-color:#A0C4DF;transition:background-color .3s,transform .3s}
 [data-ergebnis="marke"].rg-mk:not(.rg-mk-zu) .methode_panel-punkt.rg-an .methode_panel-marke{background-color:#AA1351;transform:scale(1.25)}
-@media (prefers-reduced-motion:reduce){.rg-mk-inhalt,.rg-mk-plus::before,.rg-mk-plus::after,.methode_panel-marke{transition:none}}
+@media (prefers-reduced-motion:reduce){.rg-mk-inhalt,.rg-mk-plus::before,.rg-mk-plus::after,.methode_panel-marke{transition:none}[data-linien="laufen"] .rg-m-linien path.rg-w{animation:none}}
 `;
 
 function klapp(el) {
@@ -228,23 +235,26 @@ function klapp(el) {
     svg.setAttribute('aria-hidden', 'true');
     linien.appendChild(svg);
   }
-  let offenK = -1;
+  let offenK = -1, pfeil = null;
+  /* Ab 1.26.0 werden die Pfade nur einmal angelegt und danach nur verschoben, damit eine laufende Linie
+     (data-linien="laufen") beim Auf- und Zuklappen nicht neu beginnt. */
   function zeichnen() {
     if (!svg) return;
     const wr = linien.getBoundingClientRect();
-    if (!wr.width) { svg.innerHTML = ''; return; }
+    if (!wr.width) { svg.innerHTML = ''; pfade = []; pfeil = null; return; }
+    if (pfade.length !== teile.length || !pfeil) {
+      svg.innerHTML = teile.map(({ z }) => `<path class="rg-w${z.classList.contains('is-otj') ? ' rg-otj' : ''}"/>`).join('') + '<path class="rg-pfeil"/>';
+      pfade = [...svg.querySelectorAll('path.rg-w')];
+      pfeil = svg.querySelector('path.rg-pfeil');
+    }
     const pr = panel.getBoundingClientRect();
     const ty = pr.top + pr.height / 2 - wr.top, w = wr.width;
     svg.setAttribute('viewBox', `0 0 ${w} ${wr.height}`);
-    let h = '';
-    teile.forEach(({ z, kopf }) => {
+    teile.forEach(({ z, kopf }, k) => {
       const b = (kopf || z).getBoundingClientRect(), y = b.top + b.height / 2 - wr.top;
-      const otj = z.classList.contains('is-otj') ? ' rg-otj' : '';
-      h += `<path class="rg-w${otj}" d="M0,${y} C${w * 0.55},${y} ${w * 0.45},${ty} ${w - 2},${ty}"/>`;
+      pfade[k].setAttribute('d', `M0,${y} C${w * 0.55},${y} ${w * 0.45},${ty} ${w - 2},${ty}`);
     });
-    h += `<path class="rg-pfeil" d="M${w - 10},${ty - 6} L${w - 2},${ty} L${w - 10},${ty + 6}"/>`;
-    svg.innerHTML = h;
-    pfade = [...svg.querySelectorAll('path.rg-w')];
+    pfeil.setAttribute('d', `M${w - 10},${ty - 6} L${w - 2},${ty} L${w - 10},${ty + 6}`);
     pfade.forEach((p, k) => p.classList.toggle('rg-hl', k === offenK));
   }
   /* während des Auf- und Zuklappens die Linien mitführen; bei Öffnen per Maus die Zeile unter der Maus halten */
