@@ -81,6 +81,10 @@ Prüfwerkzeuge: `pruefung/messen.js` (Ladezeit, Datenmenge), `pruefung/rechenlas
 - Start erst nach dem Laden der Seite; jede Grafik rechnet nur, solange sie sichtbar ist. Ab 1.27.0 warten die Grafiken zusätzlich, solange die Seite im Hintergrund vorgeladen wird oder beim Seitenwechsel noch einfährt (`html[data-rg-wechsel]`, gesetzt vom Kopf-Skript «ROWAPASeitenwechsel» ab 1.1.0, ab 1.2.0 bei jedem Seitenwechsel); bis dahin stehen die Standbilder.
 - Werkzeuge zum Neuerzeugen der Standbilder (Punktfiguren, Treppe, Kugel, Symbole): Ordner [`figuren/`](figuren/LIESMICH.md).
 
+## 1.31.0 (02.11.2026)
+
+- `themen` mit `data-nachoben="mitlaufen"` an der Section: Der Knopf «Nach oben» bleibt auf der Bühne der Themenlinien unten rechts stehen (bisher ausgeblendet, solange die Bühne steht), damit man ohne Durchscrollen an den Seitenanfang und zur Navigation kommt (Entscheid 405).
+
 ## 1.30.0 (01.11.2026)
 
 - **Kopf gemeinsam einblenden** (Entscheid 404, zuerst nur auf den Entwurfsseiten): Steht am `html`-Element `data-rg-kopf` mit der Einblendzeit in Sekunden (z. B. `0.8`), startet das Wellenmeer im ersten Bildschirm sofort, nicht erst nach dem Laden und auch während eines Seitenwechsels, und blendet in genau dieser Zeit ein. Mit seinem ersten Bild setzt das Skript `html.rg-kopf-an`; daran hängt das CSS, das den übrigen Inhalt des Headers gleich lang einblendet (Kopf-Skript «ROWAPAEntwurfKopf» der Entwurfsseiten). Ohne WebGL, ohne Wellenmeer oder bei «Bewegung reduzieren» kommen `rg-kopf-an` und `rg-kopf-standbild` sofort.

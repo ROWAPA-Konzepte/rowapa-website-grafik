@@ -12,6 +12,8 @@
      fährt sofort genau ein Thema weiter, der Nachlauf wird übergangen. Tastatur und Scrollbalken rasten in Scrollrichtung
      ein (früheres Verhalten, mit dem Mausrad zum Vergleichen noch über ?einrasten=rad).
      Klick auf ein Thema der Liste scrollt in einer Sekunde dorthin. Die Navigation ist ausgeblendet, solange die Bühne steht.
+     Ab 1.31.0 (Entscheid 405): data-nachoben="mitlaufen" an der Section lässt den Knopf «Nach oben» auf der Bühne stehen
+     (unten rechts), damit man ohne Durchscrollen an den Seitenanfang und zur Navigation kommt. Ohne Attribut wie bisher ausgeblendet.
    Darunter (Tablet, Handy): Blöcke untereinander mit stehender Leiste (Handy seit 1.17.0: jeder Block füllt den
    Bildschirm und wird vom nächsten von unten zugedeckt, ohne Einrasten); der Titel im Blick ist voll, die anderen blass,
    der ausscheidende Block dunkelt ab, die Form zerfällt, während der Block in den Blick rückt. Bei «Bewegung reduzieren»
@@ -181,7 +183,8 @@ export function themen(sec) {
   const n = panels.length;
   if (!huelle || !buehne || !box || !n) return;
   const nav = document.querySelector('.navbar_component');
-  const hoch = document.querySelector('.nach-oben');
+  /* «Nach oben» auf der Bühne ausblenden (Standard) oder mitlaufen lassen (data-nachoben="mitlaufen", ab 1.31.0) */
+  const hoch = (sec.getAttribute('data-nachoben') || '').toLowerCase() === 'mitlaufen' ? null : document.querySelector('.nach-oben');
   const mitForm = plumform(sec) === 'an';
   if (window.ROWAPAGrafik) window.ROWAPAGrafik.plumform = mitForm ? 'an' : 'aus';
 
