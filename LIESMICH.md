@@ -78,7 +78,13 @@ Prüfwerkzeuge: `pruefung/messen.js` (Ladezeit, Datenmenge), `pruefung/rechenlas
 - Jede Grafik baut sich einmal auf und ruht dann. Dauerhaft bewegt sind nur das Punktemeer (Header, Footer) und die Kugel mit den Kacheln, alle langsam und nie gleichzeitig im Bild.
 - Kein Scroll-Halt und kein Farbfluss. Ausnahme Themenlinien (Entscheid ROWAPA, Runde 20): Auf Seiten mit dieser Section scrollt die Seite ab 992 px weich (Lenis) und rastet in der Section auf die Themen ein, wie die Referenz. Bei «Bewegung reduzieren» und auf Tablet und Handy bleibt das Scrollen normal. Zweite Ausnahme (Entscheid 368, ab 1.19.0): «Fünf Methoden» der Performance-Analyse steht ab 992 px für fünf kurze Schritte (je 190 px), ohne Lenis.
 - Die einzige Einblendung der Startseite ist die Farbfläche im Blickpunkt (CAS); sie ist eine native Webflow-Interaction, nicht Teil dieses Skripts. Ebenso nativ: Titel-Strich und Team-Kacheln nacheinander.
-- Start erst nach dem Laden der Seite; jede Grafik rechnet nur, solange sie sichtbar ist.
+- Start erst nach dem Laden der Seite; jede Grafik rechnet nur, solange sie sichtbar ist. Ab 1.27.0 warten die Grafiken zusätzlich, solange die Seite im Hintergrund vorgeladen wird oder beim Seitenwechsel noch einfährt (`html[data-rg-wechsel]`, gesetzt vom Kopf-Skript «ROWAPASeitenwechsel» ab 1.1.0 in den Fassungen «neu» und «kurz»); bis dahin stehen die Standbilder.
+- Werkzeuge zum Neuerzeugen der Standbilder (Punktfiguren, Treppe, Kugel, Symbole): Ordner [`figuren/`](figuren/LIESMICH.md).
+
+## 1.27.0 (01.11.2026)
+
+- Start wartet auf das Ende des Seitenwechsels (`data-rg-wechsel` und Ereignis `rg-wechsel-fertig`, längstens 2,5 s) und bei vorgeladenen Seiten auf das Anzeigen (`document.prerendering`). Ohne das Attribut startet alles wie bisher. Entscheid 397: Seitenwechsel ohne Ruckeln.
+- Ordner `figuren/` aus dem Website-Repository übernommen (vorher `tools/grafik/figuren`).
 
 ## 1.26.0 (01.11.2026)
 

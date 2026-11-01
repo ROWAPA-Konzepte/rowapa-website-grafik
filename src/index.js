@@ -47,13 +47,31 @@ function start() {
   });
 }
 
+/* Seitenwechsel (Kopf-Skript «ROWAPASeitenwechsel» ab 1.1.0, Fassungen «neu» und «kurz»): Solange die Seite im Hintergrund
+   vorgeladen wird (document.prerendering) oder beim Seitenwechsel noch einfährt (html[data-rg-wechsel]), warten die Grafiken;
+   bis dahin stehen die Standbilder. So muss der Browser während des Einfahrens nichts anderes rechnen. Ohne dieses Attribut
+   (Fassung «heute») startet alles wie bisher. */
+function nachWechsel(f) {
+  if (document.prerendering) {
+    let weiter = false;
+    const w = () => { if (!weiter) { weiter = true; setTimeout(() => nachWechsel(f), 0); } };
+    document.addEventListener('prerenderingchange', () => { addEventListener('pagereveal', w, { once: true }); setTimeout(w, 400); }, { once: true });
+    return;
+  }
+  if (!document.documentElement.hasAttribute('data-rg-wechsel')) { f(); return; }
+  let los = false;
+  const g = () => { if (!los) { los = true; f(); } };
+  addEventListener('rg-wechsel-fertig', g, { once: true });
+  setTimeout(g, 2500);
+}
+
 diagnose(info);
 /* erst nach dem Laden der Seite, damit der erste Bildaufbau nicht verzögert wird; hängt eine Datei (langsames Netz),
    startet alles spätestens 5 s nach dem Aufbau der Seite */
-if (document.readyState === 'complete') setTimeout(start, 0);
+if (document.readyState === 'complete') nachWechsel(() => setTimeout(start, 0));
 else {
-  addEventListener('load', () => setTimeout(start, 0), { once: true });
-  const spaetestens = () => setTimeout(start, 5000);
+  addEventListener('load', () => nachWechsel(() => setTimeout(start, 0)), { once: true });
+  const spaetestens = () => setTimeout(() => nachWechsel(start), 5000);
   if (document.readyState === 'interactive') spaetestens();
   else document.addEventListener('DOMContentLoaded', spaetestens, { once: true });
 }
