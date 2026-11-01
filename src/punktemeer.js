@@ -1,7 +1,10 @@
 /* Punktemeer: welliges Punktfeld mit WebGL (Header, Footer).
    Das Standbild im Element bleibt darunter liegen und ist zugleich Ersatz,
    falls WebGL fehlt oder «Bewegung reduzieren» eingestellt ist.
-   Auf Wunsch liegt darüber ein ruhiges Netz aus Plum-Knoten (data-netz, siehe netz.js). */
+   Auf Wunsch liegt darüber ein ruhiges Netz aus Plum-Knoten (data-netz, siehe netz.js).
+   Ab 1.30.0 nimmt punktemeer(box, art, opt) zwei Optionen an (für «Kopf gemeinsam einblenden», siehe index.js):
+   opt.dauer = Einblendzeit in Sekunden (Standard 1,4), opt.bereit(live) = wird beim ersten gezeichneten Bild mit true
+   aufgerufen, ohne WebGL sofort mit false. */
 import { clamp, lerp, easeInOut, zahl, farbe, sichtbar, takt, istHandy } from './util.js';
 import { netz, netzStufe } from './netz.js';
 
@@ -61,24 +64,26 @@ function shader(gl, typ, src) {
   return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null;
 }
 
-export function punktemeer(box, art) {
+export function punktemeer(box, art, opt = {}) {
   const o = ARTEN[art];
-  if (!o) return;
+  const bereit = typeof opt.bereit === 'function' ? opt.bereit : () => {};
+  if (!o) { bereit(false); return; }
+  const dauer = opt.dauer > 0 ? opt.dauer : 1.4;
   /* Ebene über dem Standbild: Hintergrund (falls nötig) und darin die Zeichenfläche */
   const ebene = document.createElement('div');
   ebene.setAttribute('aria-hidden', 'true');
-  ebene.style.cssText = 'position:absolute;inset:0;overflow:hidden;opacity:0;transition:opacity 1.4s ease;pointer-events:none' + (o.bg ? ';background:' + o.bg : '');
+  ebene.style.cssText = 'position:absolute;inset:0;overflow:hidden;opacity:0;transition:opacity ' + dauer + 's ease;pointer-events:none' + (o.bg ? ';background:' + o.bg : '');
   const cv = document.createElement('canvas');
   const [top, hoehe] = istHandy() ? o.bandHandy : o.band;
   cv.style.cssText = `position:absolute;left:0;width:100%;top:${top}%;height:${hoehe}%;display:block;-webkit-mask-image:${o.maske};mask-image:${o.maske}`;
   ebene.appendChild(cv);
   const gl = cv.getContext('webgl', { antialias: true, alpha: true, premultipliedAlpha: true, powerPreference: 'low-power' });
-  if (!gl) return;
+  if (!gl) { bereit(false); return; }
   const vs = shader(gl, gl.VERTEX_SHADER, VS), fs = shader(gl, gl.FRAGMENT_SHADER, FS);
-  if (!vs || !fs) return;
+  if (!vs || !fs) { bereit(false); return; }
   const pr = gl.createProgram();
   gl.attachShader(pr, vs); gl.attachShader(pr, fs); gl.linkProgram(pr);
-  if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) return;
+  if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) { bereit(false); return; }
   gl.useProgram(pr);
   box.appendChild(ebene);
   const stufe = netzStufe(box, art);
@@ -180,7 +185,7 @@ export function punktemeer(box, art) {
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.POINTS, 0, n);
     if (netzZeichnen) netzZeichnen({ V, P, t: sek * tempo, sek, amp, rip, m, w: cv.clientWidth, h: cv.clientHeight, dpr });
-    if (erst) { erst = false; ebene.style.opacity = '1'; }
+    if (erst) { erst = false; ebene.style.opacity = '1'; bereit(true); }
     return true;
   }
   sichtbar(box, v => {

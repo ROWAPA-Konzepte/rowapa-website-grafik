@@ -36,6 +36,7 @@ function start() {
   hoverVideos(info);
   const ruhig = reduziert();
   document.querySelectorAll('[data-grafik]').forEach(el => {
+    if (el.hasAttribute('data-rg-kopf-laeuft')) return; /* schon mit dem Kopf gestartet (1.30.0) */
     const art = (el.getAttribute('data-grafik') || '').trim().toLowerCase();
     const name = art.split('-')[0];
     const f = BEDIENUNG[name] || (!ruhig && BEWEGUNG[name]);
@@ -65,7 +66,29 @@ function nachWechsel(f) {
   setTimeout(g, 2500);
 }
 
+/* Ab 1.30.0: Kopf gemeinsam einblenden. Steht am html-Element data-rg-kopf (Einblendzeit in Sekunden, z. B. "0.8"), startet
+   das Wellenmeer im ersten Bildschirm sofort, nicht erst nach dem Laden und auch während eines Seitenwechsels, und blendet in
+   genau dieser Zeit ein. Mit seinem ersten Bild setzt das Skript html.rg-kopf-an; daran hängt das CSS, das den übrigen Inhalt
+   des Headers gleich lang einblendet (heute im Kopf-Skript der Entwurfsseiten). Ohne WebGL, ohne Wellenmeer oder bei
+   «Bewegung reduzieren» kommen rg-kopf-an und rg-kopf-standbild sofort: Der Header steht mit dem Standbild da. */
+function kopf() {
+  const H = document.documentElement;
+  const d = parseFloat(H.getAttribute('data-rg-kopf'));
+  if (!(d > 0)) return;
+  info.kopf = d;
+  const an = live => {
+    if (!live) H.classList.add('rg-kopf-standbild');
+    if (!H.classList.contains('rg-kopf-an')) { H.classList.add('rg-kopf-an'); info.kopfAn = performance.now(); }
+  };
+  if (reduziert()) { an(false); return; }
+  const box = [...document.querySelectorAll('[data-grafik="punktemeer"]')].find(e => e.getBoundingClientRect().top < innerHeight);
+  if (!box) { an(false); return; }
+  box.setAttribute('data-rg-kopf-laeuft', '');
+  try { punktemeer(box, 'punktemeer', { dauer: d, bereit: an }); } catch (e) { an(false); }
+}
+
 diagnose(info);
+kopf();
 /* erst nach dem Laden der Seite, damit der erste Bildaufbau nicht verzögert wird; hängt eine Datei (langsames Netz),
    startet alles spätestens 5 s nach dem Aufbau der Seite */
 if (document.readyState === 'complete') nachWechsel(() => setTimeout(start, 0));
