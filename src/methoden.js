@@ -16,7 +16,11 @@
    Ab 1.24.0 (Entscheid 394): data-oeffnen="hover" am Behälter öffnet eine Methode auch, wenn die Maus darüberfährt
    (nur mit Maus, nicht auf Touch). Die vorher offene schliesst sich. Kleine Verzögerung (180 ms) und nur bei echter
    Mausbewegung; beim Zuklappen weiter oben bleibt die neu geöffnete Methode unter der Maus stehen, damit nichts springt.
-   Das Attribut wird laufend gelesen und lässt sich ein- und ausschalten. Klick funktioniert weiterhin. */
+   Das Attribut wird laufend gelesen und lässt sich ein- und ausschalten. Klick funktioniert weiterhin.
+
+   Ab 1.25.0 (Entscheid 395): data-ergebnis="marke" am Behälter lässt im Ergebnis-Kasten alle Punkte voll sichtbar;
+   nur die Marke (methode_panel-marke) der Punkte der offenen Methode wird Plum. Auch die feste Plum-Marke (is-plum) ist
+   dann nur Plum, wenn ihre Methode offen ist. Ohne das Attribut wie bisher: Punkte der übrigen Methoden treten zurück. */
 import { clamp, zahl, takt } from './util.js';
 
 const CSS = `
@@ -175,7 +179,10 @@ const CSS_KLAPP = `
 .rg-mk .methode_zeile.rg-offen{border-left-color:#AA1351}
 .rg-mk .methode_panel-punkt{transition:opacity .35s}
 .rg-mk .methode_panel-punkt:not(.rg-an){opacity:.3}
-@media (prefers-reduced-motion:reduce){.rg-mk-inhalt,.rg-mk-plus::before,.rg-mk-plus::after{transition:none}}
+[data-ergebnis="marke"].rg-mk .methode_panel-punkt:not(.rg-an){opacity:1}
+[data-ergebnis="marke"].rg-mk .methode_panel-marke{background-color:#A0C4DF;transition:background-color .3s,transform .3s}
+[data-ergebnis="marke"].rg-mk:not(.rg-mk-zu) .methode_panel-punkt.rg-an .methode_panel-marke{background-color:#AA1351;transform:scale(1.25)}
+@media (prefers-reduced-motion:reduce){.rg-mk-inhalt,.rg-mk-plus::before,.rg-mk-plus::after,.methode_panel-marke{transition:none}}
 `;
 
 function klapp(el) {
@@ -253,6 +260,7 @@ function klapp(el) {
   }
 
   function setzen(k, halten) {
+    el.classList.toggle('rg-mk-zu', k < 0);
     anker = halten && teile[k] ? { el: teile[k].kopf || teile[k].z, top: (teile[k].kopf || teile[k].z).getBoundingClientRect().top } : null;
     offenK = k;
     teile.forEach((t, i) => {

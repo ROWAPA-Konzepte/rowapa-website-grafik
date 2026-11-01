@@ -1,7 +1,7 @@
 {
   "name": "rowapa-grafik",
   "private": true,
-  "version": "1.24.0",
+  "version": "1.25.0",
   "description": "Punkte-Grafiken der ROWAPA-Website (Webflow), ohne Bibliotheken",
   "scripts": {
     "build": "node build.mjs"
