@@ -45,3 +45,16 @@ Danach auf 96 Farben reduzieren (PNG mit Transparenz, rund 55 KB).
 `icons/icon-anker.svg`, `-kompass`, `-lotse`, `-segel`, `-logbuch`: Lucide-Symbole (ISC-Lizenz) wie in der ersten Fassung, Strich 1,5 px in Sea Cliff. In Webflow unter Assets › «02 Grafiken».
 
 Playwright und esbuild: `kugel.mjs` lädt Playwright über `require` (globale Installation, ggf. `NODE_PATH` setzen).
+
+## Hebel-Figuren (Runde 98, Entwurf)
+
+Vier Punktfiguren für die Hebel-Karten der Themenlinie Vertriebsperformance, gleiche Kamera und gleicher Punkt-Shader wie die Vertriebs-Treppe:
+`gespraech` (zwei Personen mit Sprechblase), `story` (Bogen mit Stationen, Ziel in Plum), `pfad` (Weg mit drei Stationen und Plum-Fahne), `hybrid` (Bildschirm mit Person und Verbindung).
+Je zwei Farbsätze: `hell` (Manganese, Great Serpent, Mischton, Plum) für helle Karten und `dunkel` (Weiss, Sea-Cliff-Töne, Plum hell) für dunkle Karten.
+
+```
+NODE_PATH=$(npm root -g) node figuren/hebel.js   # roh-hebel-NAME-hell.png / -dunkel.png
+```
+
+Danach auf den Inhalt zuschneiden, auf 1100 px Breite verkleinern und auf 64 Farben reduzieren (PNG mit Transparenz, 51–79 KB) → `hebel/grafik-hebel-NAME-PAL.png`.
+In Webflow unter Assets › «02 Grafiken», im CMS «Hebel» in den Feldern «Motiv für helle Karten» und «Motiv für dunkle Karten». Welches Bild sichtbar ist, steuern die Theme-Variablen «Motiv für hellen Grund» und «Motiv für dunklen Grund» (Deckkraft je Modus).
