@@ -82,6 +82,10 @@ Prüfwerkzeuge: `pruefung/messen.js` (Ladezeit, Datenmenge), `pruefung/rechenlas
 - Start erst nach dem Laden der Seite; jede Grafik rechnet nur, solange sie sichtbar ist. Ab 1.27.0 warten die Grafiken zusätzlich, solange die Seite im Hintergrund vorgeladen wird oder beim Seitenwechsel noch einfährt (`html[data-rg-wechsel]`, gesetzt vom Kopf-Skript «ROWAPASeitenwechsel» ab 1.1.0, ab 1.2.0 bei jedem Seitenwechsel); bis dahin stehen die Standbilder.
 - Werkzeuge zum Neuerzeugen der Standbilder (Punktfiguren, Treppe, Kugel, Symbole): Ordner [`figuren/`](figuren/LIESMICH.md).
 
+## 1.33.0 (02.11.2026)
+
+- Neues Modul `punktbild` (Runde 99, Entwurf Vertriebsperformance): Einzelne Punkte erhalten einen Zusammenhang. Ein Punktfeld verwandelt sich in 0,75 s in eine Form und bleibt dann stehen (keine Dauerbewegung, schematische Illustration). `data-grafik="punktbild"`, `data-form` = `ordnen` (Informationen → Richtung), `verbinden` (Gesprächsmomente → Weg mit nächstem Schritt), `buendeln` (drei Kanäle → ein Kreis), `kreislauf` (Impulse → wiederkehrende Anwendung), `produkt` (Gespräch läuft auf das Produkt zu), `kunde` (vom Produkt-Ablauf zu vier Phasen rund um den Kunden). `data-start` `vorher`/`nachher`, `data-ausloesen` `klick` (Standard) oder `sichtbar`, `data-dauer`. Knopf mit `data-punktbild-ausloeser` im selben Reiter oder `data-punktbild-bereich` schaltet um (`aria-pressed`); jedes Öffnen des Reiters beginnt beim Start. Farben aus den CI-Variablen, auf dunklem Grund Sea Cliff und helles Plum. Bei «Bewegung reduzieren» ohne Bewegung. Beschriftungen bleiben Webflow-Elemente.
+
 ## 1.32.0 (02.11.2026)
 
 - Neues Modul `auswertung` (Entscheid 406): Beispielauswertungen der Performance-Analyse bauen sich je Reiter Schritt für Schritt auf (Diagramm, Abweichung, Einordnung, Empfehlungen), mit Schrittleiste über dem Inhalt. Ersetzt die Umschaltleiste der Entwurfsseite; Raster, Fragenspalte in Manganese, «Einordnung» und «Empfehlungen» sind Webflow-Klassen und -Elemente.
