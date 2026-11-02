@@ -127,7 +127,7 @@ const FORMEN = {
       const t = i / 9;
       n.push(P(bx - s / 2 + t * s, by - s / 2, 0), P(bx + s / 2, by - s / 2 + t * s, 0), P(bx + s / 2 - t * s, by + s / 2, 0), P(bx - s / 2, by + s / 2 - t * s, 0));
     }
-    for (let i = 0; i < 12; i++) n.push(P(bx - s * 0.32 + (i % 4) * s * 0.21, by - s * 0.2 + Math.floor(i / 4) * s * 0.2, 0));
+    /* innen frei für die Beschriftung «Produkt» */
     /* Gesprächsschritte laufen in einer Linie auf das Produkt zu */
     const xs = [0.08, 0.24, 0.4, 0.54].map(t => t * A);
     xs.forEach(x => n.push(...kreis(x, by, 0.035, 6, 0, Math.PI * 2, 0)));
