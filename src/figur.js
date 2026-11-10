@@ -34,14 +34,16 @@ export function figur(box) {
      vollständig eingefahren; die Figur bleibt dann als Standbild stehen und baut sich nicht noch einmal auf */
   if (sofort && document.documentElement.hasAttribute('data-rg-angekommen')) { zeige(); return; }
   if (!/\.png(\?|\s|$)/i.test(img.getAttribute('src') || '')) { if (sofort) zeige(); return; }
-  const r0 = box.getBoundingClientRect();
-  if (!sofort && r0.top < innerHeight && r0.bottom > 0) return;
-
   const tempo = clamp(zahl(box, 'data-tempo', 1), 0.2, 3);
   const verz = zahl(box, 'data-verzoegerung', sofort ? 0.25 : index * 0.12);
   const gross = box.clientWidth * box.clientHeight > 120000;
   const ziel = Math.round((gross ? 2400 : 900) * clamp(zahl(box, 'data-dichte', 1), 0.3, 2) * (istHandy() ? 0.6 : 1));
-  let cv, ctx, teile, fertig = false;
+  /* ab 1.35.0: data-wiederholen="ja" baut die Figur bei jedem neuen Hineinscrollen wieder auf */
+  const wieder = (box.getAttribute('data-wiederholen') || '').trim().toLowerCase() === 'ja';
+  let cv, ctx, teile, fertig = false, beobachtet = false, hoverAn = false;
+
+  const r0 = box.getBoundingClientRect();
+  if (!sofort && r0.top < innerHeight && r0.bottom > 0) { fertig = true; wiederholen(); return; }
 
   /* Vorbereiten, sobald die Figur näher als 1,5 Bildschirmhöhen ist */
   sobaldNahe(box, () => {
@@ -124,15 +126,36 @@ export function figur(box) {
       img.style.transition = 'opacity .6s ease';
       zeige();
       cv.style.opacity = '0';
-      setTimeout(() => { cv.remove(); fertig = true; hover(); }, 700);
+      const alt = cv;
+      setTimeout(() => { alt.remove(); if (cv === alt) cv = null; fertig = true; hover(); wiederholen(); }, 700);
       return false;
     });
   }
 
   /* beim Darüberfahren zieht sich die Figur leicht zusammen */
+  /* Figur ganz aus dem Bild: zurücksetzen; zu 30 % wieder im Bild: neu aufbauen */
+  function wiederholen() {
+    if (!wieder || beobachtet || !('IntersectionObserver' in window)) return;
+    beobachtet = true;
+    let draussen = false;
+    new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) {
+        if (!fertig) return;
+        draussen = true; fertig = false;
+        img.style.transition = 'none'; img.style.opacity = '0';
+        if (cv) { cv.remove(); cv = null; }
+      } else if (draussen && e.intersectionRatio >= 0.3) {
+        draussen = false;
+        if (vorbereiten()) starten(); else zeigeOriginal();
+      }
+    }), { threshold: [0, 0.3] }).observe(box);
+  }
+
   function hover() {
+    if (hoverAn) return;
     const karte = box.closest('a, [class*="card"]');
     if (!karte) return;
+    hoverAn = true;
     beiMaus(() => {
       img.style.transition = 'transform .7s cubic-bezier(.2,.7,.1,1), opacity .6s ease';
       img.style.transformOrigin = '50% 70%';

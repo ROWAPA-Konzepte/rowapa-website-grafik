@@ -82,6 +82,10 @@ Prüfwerkzeuge: `pruefung/messen.js` (Ladezeit, Datenmenge), `pruefung/rechenlas
 - Start erst nach dem Laden der Seite; jede Grafik rechnet nur, solange sie sichtbar ist. Ab 1.27.0 warten die Grafiken zusätzlich, solange die Seite im Hintergrund vorgeladen wird oder beim Seitenwechsel noch einfährt (`html[data-rg-wechsel]`, gesetzt vom Kopf-Skript «ROWAPASeitenwechsel» ab 1.1.0, ab 1.2.0 bei jedem Seitenwechsel); bis dahin stehen die Standbilder.
 - Werkzeuge zum Neuerzeugen der Standbilder (Punktfiguren, Treppe, Kugel, Symbole): Ordner [`figuren/`](figuren/LIESMICH.md).
 
+## 1.35.0 (10.11.2026)
+
+- `punktfigur`: `data-wiederholen="ja"` baut die Figur bei jedem neuen Hineinscrollen wieder aus Punkten auf (Wunsch ROWAPA, Runde 106: Hebel-Karten). Ist die Figur ganz aus dem Bild, wird sie zurückgesetzt; ist sie wieder zu 30 % sichtbar, baut sie sich neu auf. Ohne Attribut wie bisher einmal.
+
 ## 1.34.0 (10.11.2026)
 
 - `punktemeer`: ruhiges Meer für die Unterseiten (Runde 105, Wunsch ROWAPA: Startseite bleibt, Folgeseiten ruhiger). `data-meer="ruhig"` am Element oder an einem Eltern-Element (z. B. Section oder Body) halbiert die Wellenhöhe, nimmt das Tempo auf 70 % und lässt das Netz weg. Zum Vergleichen übersteuert die Adresse `?meer=ruhig` oder `?meer=voll`. Ohne Angabe bleibt alles wie bisher. `ROWAPAGrafik.meer` zeigt den Modus.
