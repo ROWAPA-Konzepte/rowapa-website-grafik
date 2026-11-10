@@ -40,9 +40,12 @@ export function figur(box) {
   const ziel = Math.round((gross ? 2400 : 900) * clamp(zahl(box, 'data-dichte', 1), 0.3, 2) * (istHandy() ? 0.6 : 1));
   /* ab 1.35.0: data-wiederholen="ja" baut die Figur bei jedem neuen Hineinscrollen wieder auf */
   const wieder = (box.getAttribute('data-wiederholen') || '').trim().toLowerCase() === 'ja';
+  /* ab 1.36.0: data-aufbau="scroll" koppelt den Aufbau an die Scrollposition (vorwärts baut auf, rückwärts löst auf) */
+  const scrollAufbau = (box.getAttribute('data-aufbau') || '').trim().toLowerCase() === 'scroll';
   let cv, ctx, teile, fertig = false, beobachtet = false, hoverAn = false;
 
   const r0 = box.getBoundingClientRect();
+  if (scrollAufbau) { scrollModus(); return; }
   if (!sofort && r0.top < innerHeight && r0.bottom > 0) { fertig = true; wiederholen(); return; }
 
   /* Vorbereiten, sobald die Figur näher als 1,5 Bildschirmhöhen ist */
@@ -133,6 +136,33 @@ export function figur(box) {
   }
 
   /* beim Darüberfahren zieht sich die Figur leicht zusammen */
+  /* Scroll-Aufbau: Fortschritt 0, wenn die Figur unten ins Bild kommt, 1, wenn ihre Oberkante bei 35 % der Fensterhöhe steht */
+  function scrollModus() {
+    let bereit = false, wartet = false;
+    const zeichneFortschritt = () => {
+      wartet = false;
+      if (!bereit) return;
+      const r = box.getBoundingClientRect();
+      const p = clamp((innerHeight - r.top) / (innerHeight * 0.65), 0, 1);
+      if (p >= 1) { img.style.opacity = sofort ? '1' : ''; cv.style.opacity = '0'; return; }
+      img.style.opacity = '0'; cv.style.opacity = '1';
+      const spread = (gross ? 0.55 : 0.4) / tempo, dauer = (gross ? 0.7 : 0.55) / tempo;
+      zeichne(p * (spread + dauer));
+    };
+    const anstossen = () => { if (!wartet) { wartet = true; requestAnimationFrame(zeichneFortschritt); } };
+    sobaldNahe(box, () => {
+      img.loading = 'eager';
+      const los = () => {
+        if (!vorbereiten()) { zeige(); return; }
+        cv.style.transition = 'none';
+        bereit = true; zeichneFortschritt();
+        addEventListener('scroll', anstossen, { passive: true });
+        addEventListener('resize', () => { if (cv) cv.remove(); cv = null; bereit = vorbereiten(); if (bereit) cv.style.transition = 'none'; anstossen(); });
+      };
+      if (img.complete && img.naturalWidth) los(); else img.addEventListener('load', los, { once: true });
+    }, '150% 0px');
+  }
+
   /* Figur ganz aus dem Bild: zurücksetzen; zu 30 % wieder im Bild: neu aufbauen */
   function wiederholen() {
     if (!wieder || beobachtet || !('IntersectionObserver' in window)) return;

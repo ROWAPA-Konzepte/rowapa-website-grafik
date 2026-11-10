@@ -82,6 +82,10 @@ Prüfwerkzeuge: `pruefung/messen.js` (Ladezeit, Datenmenge), `pruefung/rechenlas
 - Start erst nach dem Laden der Seite; jede Grafik rechnet nur, solange sie sichtbar ist. Ab 1.27.0 warten die Grafiken zusätzlich, solange die Seite im Hintergrund vorgeladen wird oder beim Seitenwechsel noch einfährt (`html[data-rg-wechsel]`, gesetzt vom Kopf-Skript «ROWAPASeitenwechsel» ab 1.1.0, ab 1.2.0 bei jedem Seitenwechsel); bis dahin stehen die Standbilder.
 - Werkzeuge zum Neuerzeugen der Standbilder (Punktfiguren, Treppe, Kugel, Symbole): Ordner [`figuren/`](figuren/LIESMICH.md).
 
+## 1.36.0 (10.11.2026)
+
+- `punktfigur`: `data-aufbau="scroll"` koppelt den Aufbau an die Scrollposition (Wunsch ROWAPA, Runde 108: Hebel-Karten). Die Figur ist leer, wenn sie unten ins Bild kommt, und vollständig, wenn ihre Oberkante bei 35 % der Fensterhöhe steht; beim Zurückscrollen löst sie sich wieder auf. Ohne Attribut wie bisher.
+
 ## 1.35.0 (10.11.2026)
 
 - `punktfigur`: `data-wiederholen="ja"` baut die Figur bei jedem neuen Hineinscrollen wieder aus Punkten auf (Wunsch ROWAPA, Runde 106: Hebel-Karten). Ist die Figur ganz aus dem Bild, wird sie zurückgesetzt; ist sie wieder zu 30 % sichtbar, baut sie sich neu auf. Ohne Attribut wie bisher einmal.
