@@ -64,6 +64,13 @@ function shader(gl, typ, src) {
   return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null;
 }
 
+function meerModus(box) {
+  let w = '';
+  try { w = new URLSearchParams(location.search).get('meer') || ''; } catch (e) { /* alte Browser */ }
+  if (!w) { const el = box.closest('[data-meer]'); w = el ? el.getAttribute('data-meer') : ''; }
+  return (w || '').trim().toLowerCase() === 'ruhig' ? 'ruhig' : 'voll';
+}
+
 export function punktemeer(box, art, opt = {}) {
   const o = ARTEN[art];
   const bereit = typeof opt.bereit === 'function' ? opt.bereit : () => {};
@@ -86,8 +93,11 @@ export function punktemeer(box, art, opt = {}) {
   if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) { bereit(false); return; }
   gl.useProgram(pr);
   box.appendChild(ebene);
-  const stufe = netzStufe(box, art);
-  if (window.ROWAPAGrafik && art === 'punktemeer') window.ROWAPAGrafik.netz = stufe || 'aus';
+  /* Ab 1.34.0: ruhiges Meer für Unterseiten (data-meer="ruhig" am Element oder darüber, zum Vergleichen ?meer=ruhig|voll):
+     halbe Wellenhöhe, 70 % Tempo, kein Netz */
+  const ruhig = art === 'punktemeer' && meerModus(box) === 'ruhig';
+  const stufe = ruhig ? null : netzStufe(box, art);
+  if (window.ROWAPAGrafik && art === 'punktemeer') { window.ROWAPAGrafik.netz = stufe || 'aus'; window.ROWAPAGrafik.meer = ruhig ? 'ruhig' : 'voll'; }
 
   /* Punktfeld: 70 × 70 Einheiten, auf dem Handy weniger Punkte */
   const dichte = clamp(zahl(box, 'data-dichte', 1), 0.3, 1.5), handy = istHandy();
@@ -123,8 +133,8 @@ export function punktemeer(box, art, opt = {}) {
 
   const dpr = Math.min(devicePixelRatio || 1, 2);
   gl.uniform1f(U.uS, o.size * dpr);
-  const tempo = clamp(zahl(box, 'data-tempo', 1), 0.1, 3);
-  const amp0 = o.amp * clamp(zahl(box, 'data-hoehe', 1), 0, 3);
+  const tempo = clamp(zahl(box, 'data-tempo', 1), 0.1, 3) * (ruhig ? 0.7 : 1);
+  const amp0 = o.amp * clamp(zahl(box, 'data-hoehe', 1), 0, 3) * (ruhig ? 0.5 : 1);
   const kraeuseln = box.getAttribute('data-kraeuseln') !== 'aus';
 
   /* Kamera */
