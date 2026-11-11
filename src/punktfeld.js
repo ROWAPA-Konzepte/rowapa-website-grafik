@@ -6,7 +6,9 @@
    Der Behälter braucht eine Höhe (z. B. absolut über die ganze Section oder feste Höhe). Fortschritt: 0, wenn die
    Oberkante unten ins Bild kommt, 1, wenn sie bei 15 % der Fensterhöhe steht. Leichtes Atmen der Punkte nur ohne
    «Bewegung reduzieren»; dann steht das fertige Bild. Farben aus den CI-Variablen.
-   Ab 1.39.0: data-ablauf="film" (nur wolke): Ist die Wolke offen, läuft sie wie ein Film weiter, sie zieht sich langsam
+   Ab 1.40.0: data-ablauf="film" (nur wolke) ohne Scroll-Kopplung: Sobald ein Viertel des Feldes sichtbar ist, öffnet sich
+   die Wolke von selbst (1,8 s) und läuft dann als Film weiter (1.39.0: Öffnen noch mit dem Scrollen).
+   Film: sie zieht sich langsam
    zu vier Gruppen zusammen (unter den vier Karten) und öffnet sich wieder (Takt rund 11 s). Läuft nur, solange das Feld
    sichtbar ist; bei «Bewegung reduzieren» steht die offene Wolke. */
 import { reduziert, clamp, easeInOut, sobaldNahe, ciFarbe, takt } from './util.js';
@@ -21,7 +23,7 @@ export function punktfeld(el) {
   const form = (el.getAttribute('data-form') || 'wolke').trim().toLowerCase();
   const dunkel = (el.getAttribute('data-ton') || '').trim().toLowerCase() === 'dunkel';
   const film = form === 'wolke' && (el.getAttribute('data-ablauf') || '').trim().toLowerCase() === 'film';
-  let filmStart = -1;
+  let filmStart = -1, filmSeit = -1;
   const ruhig = reduziert();
   const zz = zufall(form.length * 977 + 111);
   const PLUM = ciFarbe('plum-perfect', '#AA1351'), SEA = ciFarbe('sea-cliff', '#A0C4DF');
@@ -94,6 +96,7 @@ export function punktfeld(el) {
 
   function fortschritt() {
     if (ruhig) return 1;
+    if (film) return filmSeit < 0 ? 0 : clamp((performance.now() - filmSeit) / 1800, 0, 1);
     const r = el.getBoundingClientRect();
     /* Film: früher ganz offen (Oberkante bei 45 % der Fensterhöhe), damit der Film läuft, solange die Karten im Bild sind */
     return clamp((innerHeight * 0.95 - r.top) / (innerHeight * (film ? 0.5 : 0.8)), 0, 1);
@@ -104,7 +107,6 @@ export function punktfeld(el) {
     const p = fortschritt();
     ctx.clearRect(0, 0, B, H);
     if (film && !ruhig && p >= 0.999 && filmStart < 0) filmStart = zeit;
-    if (film && p < 0.6) filmStart = -1;
     const filmT = filmStart < 0 ? -1 : (zeit - filmStart) / 11000 * 6.283;
     for (let i = 0; i < P.length; i++) {
       const q = P[i];
@@ -144,5 +146,6 @@ export function punktfeld(el) {
       sichtbarJetzt = es[0].isIntersecting;
       if (sichtbarJetzt && !aus) aus = takt(t => { if (!sichtbarJetzt) { aus = null; return false; } zeichne(t); });
     }).observe(el);
+    if (film) new IntersectionObserver(es => { if (filmSeit < 0 && es[0].intersectionRatio >= 0.25) filmSeit = performance.now(); }, { threshold: [0, 0.25] }).observe(el);
   }
 }

@@ -84,6 +84,10 @@ Prüfwerkzeuge: `pruefung/messen.js` (Ladezeit, Datenmenge), `pruefung/rechenlas
 - Start erst nach dem Laden der Seite; jede Grafik rechnet nur, solange sie sichtbar ist. Ab 1.27.0 warten die Grafiken zusätzlich, solange die Seite im Hintergrund vorgeladen wird oder beim Seitenwechsel noch einfährt (`html[data-rg-wechsel]`, gesetzt vom Kopf-Skript «ROWAPASeitenwechsel» ab 1.1.0, ab 1.2.0 bei jedem Seitenwechsel); bis dahin stehen die Standbilder.
 - Werkzeuge zum Neuerzeugen der Standbilder (Punktfiguren, Treppe, Kugel, Symbole): Ordner [`figuren/`](figuren/LIESMICH.md).
 
+## 1.40.0 (11.11.2026)
+
+- `punktfeld` wolke mit `data-ablauf="film"` ohne Scroll-Kopplung (Runde 114): Sobald ein Viertel des Feldes sichtbar ist, öffnet sich die Wolke von selbst (1,8 s) und läuft danach als Film weiter.
+
 ## 1.39.0 (11.11.2026)
 
 - `punktfeld` Form `wolke` mit `data-ablauf="film"` (Runde 113): Die Wolke öffnet sich mit dem Scrollen und läuft danach wie ein Film weiter (zieht sich langsam zu vier Gruppen unter den Karten zusammen und öffnet sich wieder, rund 11 s). Nur solange sichtbar; «Bewegung reduzieren» zeigt die offene Wolke.
