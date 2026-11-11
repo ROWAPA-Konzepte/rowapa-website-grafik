@@ -42,6 +42,11 @@ export function figur(box) {
   const wieder = (box.getAttribute('data-wiederholen') || '').trim().toLowerCase() === 'ja';
   /* ab 1.36.0: data-aufbau="scroll" koppelt den Aufbau an die Scrollposition (vorwärts baut auf, rückwärts löst auf) */
   const scrollAufbau = (box.getAttribute('data-aufbau') || '').trim().toLowerCase() === 'scroll';
+  /* ab 1.41.0: data-vorschau (0–1) zeigt das Bild während des Aufbaus schwach (Karte wirkt nie leer);
+     data-ausloeser (CSS-Auswahl, z. B. .hebel_item) startet den Aufbau, sobald dieses umgebende Element ins Bild kommt */
+  const vorschau = clamp(zahl(box, 'data-vorschau', 0), 0, 1);
+  const ausSel = (box.getAttribute('data-ausloeser') || '').trim();
+  const ausloeser = (ausSel && box.closest(ausSel)) || null;
   let cv, ctx, teile, fertig = false, beobachtet = false, hoverAn = false;
 
   const r0 = box.getBoundingClientRect();
@@ -50,11 +55,12 @@ export function figur(box) {
 
   /* Vorbereiten, sobald die Figur näher als 1,5 Bildschirmhöhen ist */
   sobaldNahe(box, () => {
-    img.style.opacity = '0';
+    img.style.opacity = String(vorschau);
     img.loading = 'eager';
     const los = () => {
       if (!vorbereiten()) return zeigeOriginal();
-      sobaldNahe(box, () => setTimeout(starten, verz * 1000), '0px 0px -12% 0px');
+      if (ausloeser) sobaldNahe(ausloeser, () => setTimeout(starten, verz * 1000), '0px 0px 8% 0px');
+      else sobaldNahe(box, () => setTimeout(starten, verz * 1000), '0px 0px -12% 0px');
     };
     if (img.complete && img.naturalWidth) los();
     else { img.addEventListener('load', los, { once: true }); img.addEventListener('error', zeigeOriginal, { once: true }); }
@@ -172,13 +178,13 @@ export function figur(box) {
       if (!e.isIntersecting) {
         if (!fertig) return;
         draussen = true; fertig = false;
-        img.style.transition = 'none'; img.style.opacity = '0';
+        img.style.transition = 'none'; img.style.opacity = String(vorschau);
         if (cv) { cv.remove(); cv = null; }
-      } else if (draussen && e.intersectionRatio >= 0.3) {
+      } else if (draussen && e.intersectionRatio >= (ausloeser ? 0.06 : 0.3)) {
         draussen = false;
         if (vorbereiten()) starten(); else zeigeOriginal();
       }
-    }), { threshold: [0, 0.3] }).observe(box);
+    }), { threshold: [0, ausloeser ? 0.06 : 0.3] }).observe(ausloeser || box);
   }
 
   function hover() {

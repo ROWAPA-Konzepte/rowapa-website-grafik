@@ -84,6 +84,11 @@ Prüfwerkzeuge: `pruefung/messen.js` (Ladezeit, Datenmenge), `pruefung/rechenlas
 - Start erst nach dem Laden der Seite; jede Grafik rechnet nur, solange sie sichtbar ist. Ab 1.27.0 warten die Grafiken zusätzlich, solange die Seite im Hintergrund vorgeladen wird oder beim Seitenwechsel noch einfährt (`html[data-rg-wechsel]`, gesetzt vom Kopf-Skript «ROWAPASeitenwechsel» ab 1.1.0, ab 1.2.0 bei jedem Seitenwechsel); bis dahin stehen die Standbilder.
 - Werkzeuge zum Neuerzeugen der Standbilder (Punktfiguren, Treppe, Kugel, Symbole): Ordner [`figuren/`](figuren/LIESMICH.md).
 
+## 1.41.0 (11.11.2026)
+
+- `punktfigur`: `data-vorschau` (0–1) zeigt das Bild während des Aufbaus schwach, damit eine Karte nie leer wirkt; `data-ausloeser` (CSS-Auswahl eines umgebenden Elements, z. B. `.hebel_item`) startet den Aufbau, sobald dieses ins Bild kommt (Runde 115).
+- `orbit` (Kugel der Wissensplattform): `data-staerke` (z. B. 1.6) zeichnet die Punkte grösser und deckender für helle Flächen, `data-plum` (z. B. 3) bestimmt, jeder wievielte Knoten Plum ist (Standard 6). `data-plum-schale` (z. B. 0.008) färbt einzelne Punkte der Hülle Plum.
+
 ## 1.40.0 (11.11.2026)
 
 - `punktfeld` wolke mit `data-ablauf="film"` ohne Scroll-Kopplung (Runde 114): Sobald ein Viertel des Feldes sichtbar ist, öffnet sich die Wolke von selbst (1,8 s) und läuft danach als Film weiter.

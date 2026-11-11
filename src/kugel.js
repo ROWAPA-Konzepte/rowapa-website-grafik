@@ -14,18 +14,19 @@ function zufall(seed) {
 const mische = (a, b, p) => a.map((v, i) => Math.round(v * p + b[i] * (1 - p)));
 
 /* Punkte der Kugel (Einheitskugel) und des Netzes */
-export function kugelDaten(n = 2600, seed = 7) {
+export function kugelDaten(n = 2600, seed = 7, plumJede = 6, plumSchale = 0) {
   const R = zufall(seed), schale = [], knoten = [], kanten = [];
   for (let i = 0; i < n; i++) {
     const y = 1 - (2 * (i + 0.5)) / n, r = Math.sqrt(1 - y * y), th = i * 2.399963, j = 1 + (R() - 0.5) * 0.03;
-    schale.push({ x: Math.cos(th) * r * j, y: y * j, z: Math.sin(th) * r * j, s: R(), c: y > 0.15 ? 0 : y < -0.45 ? 2 : 1 });
+    const s = R(), pl = plumSchale > 0 && R() < plumSchale;
+    schale.push({ x: Math.cos(th) * r * j, y: y * j, z: Math.sin(th) * r * j, s, c: y > 0.15 ? 0 : y < -0.45 ? 2 : 1, pl });
   }
   for (let i = 0; i < 34; i++) {
     let x, y, z;
     do { x = R() * 2 - 1; y = R() * 2 - 1; z = R() * 2 - 1; } while (x * x + y * y + z * z > 1);
     const pkt = [];
     for (let j = 0; j < 5; j++) pkt.push([x * 0.77 + (R() - 0.5) * 0.06, y * 0.77 + (R() - 0.5) * 0.06, z * 0.77 + (R() - 0.5) * 0.06]);
-    knoten.push({ x: x * 0.77, y: y * 0.77, z: z * 0.77, plum: i % 6 === 0, pkt });
+    knoten.push({ x: x * 0.77, y: y * 0.77, z: z * 0.77, plum: i % plumJede === 0, pkt });
   }
   knoten.forEach((a, i) => {
     knoten.map((b, k) => [k, (a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2]).filter(q => q[0] > i)
@@ -53,16 +54,17 @@ export function kugelFarben(f) {
 }
 
 /* zeichnet die Kugel um (cx, cy) mit Radius R, gedreht um den Winkel w */
-export function zeichneKugel(ctx, D, F, cx, cy, R, w, jedes = 1) {
+/* ab 1.41.0: staerke > 1 zeichnet die Punkte grösser und deckender (für helle Flächen) */
+export function zeichneKugel(ctx, D, F, cx, cy, R, w, jedes = 1, staerke = 1) {
   const neig = 0.42, cw = Math.cos(w), sw = Math.sin(w), cn = Math.cos(neig), sn = Math.sin(neig);
   const dreh = (x, y, z) => {
     const x1 = x * cw - z * sw, z1 = x * sw + z * cw;
     return [x1, y * cn - z1 * sn, y * sn + z1 * cn];
   };
-  const groesse = Math.max(0.6, R * 0.0095), f = 4.2;
+  const groesse = Math.max(0.6, R * 0.0095) * (0.35 + 0.65 * staerke), f = 4.2, deck = Math.min(1.6, 0.5 + 0.5 * staerke);
   const punkt = (b, x, y, z, s, a) => {
     const p = f / (f - z), r = groesse * s * (0.8 + 0.25 * (z + 1));
-    ctx.globalAlpha = a;
+    ctx.globalAlpha = Math.min(1, a * deck);
     ctx.drawImage(b, cx + x * R * p - r, cy - y * R * p - r, 2 * r, 2 * r);
   };
   const schale = (vorne) => {
@@ -70,7 +72,8 @@ export function zeichneKugel(ctx, D, F, cx, cy, R, w, jedes = 1) {
       const q = D.schale[i], [x, y, z] = dreh(q.x, q.y, q.z);
       if ((z >= 0) !== vorne) continue;
       const licht = Math.min(1, Math.max(0, 0.55 + 0.45 * z + 0.25 * y));
-      punkt(F.stufen[q.c][Math.round(licht * 7)], x, y, z, 0.55 + q.s * 0.45, 0.3 + 0.65 * (z + 1) / 2);
+      if (q.pl) punkt(F.plum, x, y, z, 1.15, 0.5 + 0.5 * (z + 1) / 2);
+      else punkt(F.stufen[q.c][Math.round(licht * 7)], x, y, z, 0.55 + q.s * 0.45, 0.3 + 0.65 * (z + 1) / 2);
     }
   };
   schale(false);

@@ -19,7 +19,9 @@ export function orbit(box) {
   const karten = raster ? [...raster.children] : [];
   const tempo = clamp(zahl(box, 'data-tempo', 1), 0.2, 3);
   const handy = istHandy();
-  const D = kugelDaten();
+  /* ab 1.41.0: data-staerke (z. B. 1.6) zeichnet die Kugel kräftiger, data-plum (z. B. 3) = jeder wievielte Knoten Plum ist */
+  const staerke = clamp(zahl(box, 'data-staerke', 1), 0.5, 2.5);
+  const D = kugelDaten(2600, 7, Math.round(clamp(zahl(box, 'data-plum', 6), 2, 12)), clamp(zahl(box, 'data-plum-schale', 0), 0, 0.05));
   const F = kugelFarben({ sea: ciFarbe('sea-cliff', '#A0C4DF'), serpent: ciFarbe('great-serpent', '#486EA3'), manganese: ciFarbe('manganese-black', '#1D3149'), plum: ciFarbe('plum-perfect', '#AA1351') });
 
   /* Anteil der Bahn je Kachel; 0 = oben. weiter zählt in Umläufen */
@@ -116,7 +118,7 @@ export function orbit(box) {
 
   function zeichne(now) {
     ctx.clearRect(0, 0, G.w, G.h);
-    zeichneKugel(ctx, D, F, G.kx, G.ky, G.R, dreh, handy ? 2 : 1);
+    zeichneKugel(ctx, D, F, G.kx, G.ky, G.R, dreh, handy ? 2 : 1, staerke);
     const k = aktiv >= 0 ? aktiv : zuletzt;
     if (linie > 0 && k >= 0) {
       const [tx, ty] = pos[k];
