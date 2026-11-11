@@ -6,7 +6,7 @@
    Optional: data-bilder (CSS-Auswahl der Bilder im Behälter, Standard img), data-ton "hell" (Bilder stehen auf hellem
    Grund, Punkte dunkel) oder "dunkel" (Standard, Punkte hell). Bilder: PNG oder WebP mit transparentem Grund.
    Fortschritt: 0, wenn die Oberkante des Ziels bei 72 % der Fensterhöhe steht, 1 bei 10 %. Die Anzeige folgt dem Scrollen
-   mit sanfter Verzögerung (rund 0,45 s). Ab 1.44.0 liegt die Leinwand im Seitenfluss (absolut, scrollt mit), damit das
+   mit sanfter Verzögerung (rund 0,45 s, zurück 0,12 s). Ab 1.45.0 bleibt das Bild scharf, bis die Punkte es verlassen haben. Ab 1.44.0 liegt die Leinwand im Seitenfluss (absolut, scrollt mit), damit das
    Band beim Scrollen nicht nachhinkt und nicht aus dem Ziel läuft.
    Bei «Bewegung reduzieren» geschieht nichts: Die Bilder bleiben stehen. */
 import { reduziert, clamp, easeInOut, sobaldNahe, ciFarbe, takt } from './util.js';
@@ -113,13 +113,15 @@ export function aufloesen(el) {
     const ziel01 = clamp((innerHeight * 0.72 - zr0.top) / (innerHeight * 0.62), 0, 1);
     /* sanft nachziehen: die Bewegung folgt dem Scrollen leicht verzögert */
     const dt = Math.min(0.1, Math.max(0, (zeit - letzt) / 1000)); letzt = zeit;
-    anz += (ziel01 - anz) * (1 - Math.exp(-dt / 0.45));
+    /* vorwärts sanft verzögert (0,45 s), zurück rasch (0,12 s), damit die Bilder schnell wieder scharf stehen */
+    anz += (ziel01 - anz) * (1 - Math.exp(-dt / (ziel01 < anz ? 0.12 : 0.45)));
     if (Math.abs(ziel01 - anz) < 0.0005) anz = ziel01;
     const p = anz;
     if (p <= 0.0005) { if (aufgeloest) { ctx.clearRect(0, 0, OW, OH); bilderZeigen(1); aufgeloest = false; } return; }
     ctx.clearRect(0, 0, OW, OH);
     aufgeloest = true;
-    bilderZeigen(1 - clamp(p / 0.12, 0, 1));
+    /* das Bild bleibt scharf stehen, während sich die Punkte lösen; es blendet erst aus, wenn sie es verlassen haben */
+    bilderZeigen(1 - clamp((p - 0.12) / 0.28, 0, 1));
     /* alle Lagen in Leinwand-Koordinaten (Seite minus Leinwand-Oberkante) */
     const dy = scrollY - OT;
     const zr = { left: zr0.left, right: zr0.right, top: zr0.top + dy, bottom: zr0.bottom + dy, width: zr0.width, height: zr0.height };
@@ -138,7 +140,9 @@ export function aufloesen(el) {
       let y = m * m * y0 + 2 * m * e * cy + e * e * by;
       x += Math.sin(zeit * 0.0006 + q.ph) * 1.2 * e; y += Math.cos(zeit * 0.0005 + q.ph) * 1.0 * e;
       if (y < -10 || y > OH + 10) continue;
-      let a = q.a;
+      /* Punkte erscheinen erst, wenn sie das Bild verlassen (kein Zerfall im Bild selbst) */
+      let a = q.a * clamp((e - 0.03) / 0.22, 0, 1);
+      if (a <= 0.01) continue;
       if (e > 0.5 && (y < zr.top || y > zr.bottom || x < zr.left || x > zr.right)) a *= 1 - e;
       const c = mix(q.c0, q.c1, e);
       ctx.globalAlpha = a;
