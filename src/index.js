@@ -21,12 +21,13 @@ import { kopfleiste } from './kopfleiste.js';
 import { auswertung } from './auswertung.js';
 import { punktbild } from './punktbild.js';
 import { punktwandel } from './punktwandel.js';
+import { punktfeld } from './punktfeld.js';
 
 const VERSION = '__VERSION__';
 
 /* Bedienung (immer) und Bewegung (nur ohne «Bewegung reduzieren»); themen, diagramm und kopfleiste prüfen «Bewegung reduzieren» selbst
    (diagramm muss immer laufen, weil es die Werte überhaupt erst setzt; punktbild zeichnet auch ohne Bewegung den Zustand) */
-const BEDIENUNG = { reihe, zeiger, vorschau, nachoben, themen, diagramm, kopfleiste, punktbild, punktwandel };
+const BEDIENUNG = { reihe, zeiger, vorschau, nachoben, themen, diagramm, kopfleiste, punktbild, punktwandel, punktfeld };
 const BEWEGUNG = { punktemeer, punktfigur: figur, zaehler, treppe, orbit, methoden, aufbau, auswertung };
 
 const info = (window.ROWAPAGrafik = { version: VERSION });
