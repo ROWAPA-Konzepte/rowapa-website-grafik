@@ -5,7 +5,10 @@
      sammeln  vier Punktgruppen (die vier Herausforderungen) laufen zu einer Linie mit Pfeil zusammen (ein Weg nach vorn)
    Der Behälter braucht eine Höhe (z. B. absolut über die ganze Section oder feste Höhe). Fortschritt: 0, wenn die
    Oberkante unten ins Bild kommt, 1, wenn sie bei 15 % der Fensterhöhe steht. Leichtes Atmen der Punkte nur ohne
-   «Bewegung reduzieren»; dann steht das fertige Bild. Farben aus den CI-Variablen. */
+   «Bewegung reduzieren»; dann steht das fertige Bild. Farben aus den CI-Variablen.
+   Ab 1.39.0: data-ablauf="film" (nur wolke): Ist die Wolke offen, läuft sie wie ein Film weiter, sie zieht sich langsam
+   zu vier Gruppen zusammen (unter den vier Karten) und öffnet sich wieder (Takt rund 11 s). Läuft nur, solange das Feld
+   sichtbar ist; bei «Bewegung reduzieren» steht die offene Wolke. */
 import { reduziert, clamp, easeInOut, sobaldNahe, ciFarbe, takt } from './util.js';
 
 function zufall(seed) {
@@ -17,6 +20,8 @@ function gauss(zz) { let u = 0; for (let i = 0; i < 4; i++) u += zz(); return (u
 export function punktfeld(el) {
   const form = (el.getAttribute('data-form') || 'wolke').trim().toLowerCase();
   const dunkel = (el.getAttribute('data-ton') || '').trim().toLowerCase() === 'dunkel';
+  const film = form === 'wolke' && (el.getAttribute('data-ablauf') || '').trim().toLowerCase() === 'film';
+  let filmStart = -1;
   const ruhig = reduziert();
   const zz = zufall(form.length * 977 + 111);
   const PLUM = ciFarbe('plum-perfect', '#AA1351'), SEA = ciFarbe('sea-cliff', '#A0C4DF');
@@ -61,7 +66,9 @@ export function punktfeld(el) {
         c0 = dunkel ? SEA : SERP; c1 = dunkel ? PLUMH : PLUM;
         r = 1 + zz() * 1.3;
       }
-      P.push({ sx, sy, tx, ty, c0, c1, r, v: zz() * 0.35, ph: zz() * 6.283, a: 0.45 + zz() * 0.55 });
+      const g = i % 4;
+      const gx = (0.125 + g * 0.25) * B + gauss(zz) * 0.045 * B, gy = 0.56 * H + gauss(zz) * 0.12 * H;
+      P.push({ sx, sy, tx, ty, gx, gy, c0, c1, r, v: zz() * 0.35, ph: zz() * 6.283, a: 0.45 + zz() * 0.55 });
     }
     P.lang = lang;
   }
@@ -88,19 +95,28 @@ export function punktfeld(el) {
   function fortschritt() {
     if (ruhig) return 1;
     const r = el.getBoundingClientRect();
-    return clamp((innerHeight * 0.95 - r.top) / (innerHeight * 0.8), 0, 1);
+    /* Film: früher ganz offen (Oberkante bei 45 % der Fensterhöhe), damit der Film läuft, solange die Karten im Bild sind */
+    return clamp((innerHeight * 0.95 - r.top) / (innerHeight * (film ? 0.5 : 0.8)), 0, 1);
   }
 
   function zeichne(zeit) {
     if (!ctx) return;
     const p = fortschritt();
     ctx.clearRect(0, 0, B, H);
+    if (film && !ruhig && p >= 0.999 && filmStart < 0) filmStart = zeit;
+    if (film && p < 0.6) filmStart = -1;
+    const filmT = filmStart < 0 ? -1 : (zeit - filmStart) / 11000 * 6.283;
     for (let i = 0; i < P.length; i++) {
       const q = P[i];
       const e = easeInOut(clamp((p - q.v * 0.6) / 0.6, 0, 1));
       const atmen = ruhig ? 0 : Math.sin(zeit * 0.0006 + q.ph) * 1.4;
-      const x = q.sx + (q.tx - q.sx) * e + atmen;
-      const y = q.sy + (q.ty - q.sy) * e + Math.cos(zeit * 0.0005 + q.ph) * (ruhig ? 0 : 1.1);
+      let x = q.sx + (q.tx - q.sx) * e + atmen;
+      let y = q.sy + (q.ty - q.sy) * e + Math.cos(zeit * 0.0005 + q.ph) * (ruhig ? 0 : 1.1);
+      if (filmT >= 0) {
+        /* Film: weich zu den vier Gruppen und zurück, jeder Punkt leicht versetzt */
+        const f = easeInOut(clamp(0.5 - 0.5 * Math.cos(filmT - q.v * 1.6), 0, 1)) * 0.88;
+        x += (q.gx - x) * f; y += (q.gy - y) * f;
+      }
       const c = [q.c0[0] + (q.c1[0] - q.c0[0]) * e, q.c0[1] + (q.c1[1] - q.c0[1]) * e, q.c0[2] + (q.c1[2] - q.c0[2]) * e];
       ctx.globalAlpha = q.a * (form === 'wolke' ? 1 - e * 0.35 : 0.55 + e * 0.45);
       ctx.fillStyle = `rgb(${c[0] | 0},${c[1] | 0},${c[2] | 0})`;
