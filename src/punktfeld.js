@@ -25,6 +25,11 @@ export function punktfeld(el) {
   const film = form === 'wolke' && (el.getAttribute('data-ablauf') || '').trim().toLowerCase() === 'film';
   let filmStart = -1, filmSeit = -1;
   const ruhig = reduziert();
+  /* ab 1.42.0: data-ziel (CSS-Auswahl, nur wolke): Beim Weiterscrollen fliessen die Punkte in das Element darunter und bilden
+     dort das Diagonal-Band (45°, wie Form band). Die Leinwand liegt dann fest über dem Fenster (position:fixed). */
+  const zielSel = (el.getAttribute('data-ziel') || '').trim();
+  const ziel = form === 'wolke' && zielSel && !ruhig ? document.querySelector(zielSel) : null;
+  const sicht = new Set();
   const zz = zufall(form.length * 977 + 111);
   const PLUM = ciFarbe('plum-perfect', '#AA1351'), SEA = ciFarbe('sea-cliff', '#A0C4DF');
   const MANG = ciFarbe('manganese-black', '#1D3149'), SERP = ciFarbe('great-serpent', '#486EA3');
@@ -70,7 +75,9 @@ export function punktfeld(el) {
       }
       const g = i % 4;
       const gx = (0.125 + g * 0.25) * B + gauss(zz) * 0.045 * B, gy = 0.56 * H + gauss(zz) * 0.12 * H;
-      P.push({ sx, sy, tx, ty, gx, gy, c0, c1, r, v: zz() * 0.35, ph: zz() * 6.283, a: 0.45 + zz() * 0.55 });
+      const q = { sx, sy, tx, ty, gx, gy, c0, c1, r, v: zz() * 0.35, ph: zz() * 6.283, a: 0.45 + zz() * 0.55 };
+      if (ziel) { q.rt = zz(); q.rg = gauss(zz); q.rc = zz() < 0.85 ? PLUMH : SEA; }
+      P.push(q);
     }
     P.lang = lang;
   }
@@ -82,13 +89,17 @@ export function punktfeld(el) {
     if (!cv) {
       cv = document.createElement('canvas');
       cv.setAttribute('aria-hidden', 'true');
+      if (ziel) { cv.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:1'; document.body.appendChild(cv); }
+      else {
       cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none';
       if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
       el.appendChild(cv);
+      }
       ctx = cv.getContext('2d');
     }
     const dpr = Math.min(devicePixelRatio || 1, 2);
-    cv.width = Math.round(B * dpr); cv.height = Math.round(H * dpr);
+    const CW = ziel ? innerWidth : B, CH = ziel ? innerHeight : H;
+    cv.width = Math.round(CW * dpr); cv.height = Math.round(CH * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     punkte(); letztP = -1;
     return true;
@@ -105,7 +116,13 @@ export function punktfeld(el) {
   function zeichne(zeit) {
     if (!ctx) return;
     const p = fortschritt();
-    ctx.clearRect(0, 0, B, H);
+    let ox = 0, oy = 0, p2 = 0, zr = null;
+    if (ziel) {
+      ctx.clearRect(0, 0, innerWidth, innerHeight);
+      const fr = el.getBoundingClientRect(); ox = fr.left; oy = fr.top;
+      zr = ziel.getBoundingClientRect();
+      p2 = clamp((innerHeight * 0.95 - zr.top) / (innerHeight * 0.6), 0, 1);
+    } else ctx.clearRect(0, 0, B, H);
     if (film && !ruhig && p >= 0.999 && filmStart < 0) filmStart = zeit;
     const filmT = filmStart < 0 ? -1 : (zeit - filmStart) / 11000 * 6.283;
     for (let i = 0; i < P.length; i++) {
@@ -119,8 +136,25 @@ export function punktfeld(el) {
         const f = easeInOut(clamp(0.5 - 0.5 * Math.cos(filmT - q.v * 1.6), 0, 1)) * 0.88;
         x += (q.gx - x) * f; y += (q.gy - y) * f;
       }
-      const c = [q.c0[0] + (q.c1[0] - q.c0[0]) * e, q.c0[1] + (q.c1[1] - q.c0[1]) * e, q.c0[2] + (q.c1[2] - q.c0[2]) * e];
-      ctx.globalAlpha = q.a * (form === 'wolke' ? 1 - e * 0.35 : 0.55 + e * 0.45);
+      let c = [q.c0[0] + (q.c1[0] - q.c0[0]) * e, q.c0[1] + (q.c1[1] - q.c0[1]) * e, q.c0[2] + (q.c1[2] - q.c0[2]) * e];
+      let alpha = q.a * (form === 'wolke' ? 1 - e * 0.35 : 0.55 + e * 0.45);
+      if (ziel) {
+        x += ox; y += oy;
+        const e2 = easeInOut(clamp((p2 - q.v * 0.7) / 0.55, 0, 1));
+        if (e2 > 0) {
+          /* Ziel: Band 45° durch das rechte Drittel des Zielelements (wie Form band) */
+          const ZB = zr.width, ZH = zr.height, quer = q.rg * 0.055 * ZH;
+          const bx = zr.left + 0.56 * ZB - 0.2 * ZH + q.rt * ZH * 1.3 + quer * 0.7071;
+          const by = zr.top + ZH * 1.15 - q.rt * ZH * 1.3 + quer * 0.7071;
+          x += (bx - x) * e2; y += (by - y) * e2;
+          c = [c[0] + (q.rc[0] - c[0]) * e2, c[1] + (q.rc[1] - c[1]) * e2, c[2] + (q.rc[2] - c[2]) * e2];
+          alpha = alpha + (q.a - alpha) * e2;
+          /* angekommen: nur innerhalb des Zielelements zeigen (wie die Form band in ihrem Feld) */
+          if (y < zr.top || y > zr.bottom || x < zr.left || x > zr.right) alpha *= 1 - e2;
+        }
+        if (y < -10 || y > innerHeight + 10) continue;
+      }
+      ctx.globalAlpha = alpha;
       ctx.fillStyle = `rgb(${c[0] | 0},${c[1] | 0},${c[2] | 0})`;
       ctx.beginPath(); ctx.arc(x, y, q.r, 0, 6.283); ctx.fill();
     }
@@ -142,10 +176,14 @@ export function punktfeld(el) {
     zeichne(0);
     addEventListener('resize', () => { if (vorbereiten()) zeichne(performance.now()); });
     if (ruhig) return;
-    new IntersectionObserver(es => {
-      sichtbarJetzt = es[0].isIntersecting;
+    const io = new IntersectionObserver(es => {
+      es.forEach(e => { if (e.isIntersecting) sicht.add(e.target); else sicht.delete(e.target); });
+      sichtbarJetzt = sicht.size > 0;
+      if (!sichtbarJetzt && ziel && ctx) ctx.clearRect(0, 0, innerWidth, innerHeight);
       if (sichtbarJetzt && !aus) aus = takt(t => { if (!sichtbarJetzt) { aus = null; return false; } zeichne(t); });
-    }).observe(el);
+    });
+    io.observe(el);
+    if (ziel) io.observe(ziel);
     if (film) new IntersectionObserver(es => { if (filmSeit < 0 && es[0].intersectionRatio >= 0.25) filmSeit = performance.now(); }, { threshold: [0, 0.25] }).observe(el);
   }
 }
