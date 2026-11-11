@@ -84,6 +84,10 @@ Prüfwerkzeuge: `pruefung/messen.js` (Ladezeit, Datenmenge), `pruefung/rechenlas
 - Start erst nach dem Laden der Seite; jede Grafik rechnet nur, solange sie sichtbar ist. Ab 1.27.0 warten die Grafiken zusätzlich, solange die Seite im Hintergrund vorgeladen wird oder beim Seitenwechsel noch einfährt (`html[data-rg-wechsel]`, gesetzt vom Kopf-Skript «ROWAPASeitenwechsel» ab 1.1.0, ab 1.2.0 bei jedem Seitenwechsel); bis dahin stehen die Standbilder.
 - Werkzeuge zum Neuerzeugen der Standbilder (Punktfiguren, Treppe, Kugel, Symbole): Ordner [`figuren/`](figuren/LIESMICH.md).
 
+## 1.43.0 (11.11.2026)
+
+- Neues Modul `aufloesen` (Runde 117): Bilder in einem Behälter (z. B. die vier Katalog-Szenen der Herausforderungen) lösen sich beim Weiterscrollen in Punkte auf und fliessen ins Zielelement (`data-ziel`), wo sie das Diagonal-Band 45° bilden. Zurückscrollen setzt die Bilder wieder zusammen. Nur ohne «Bewegung reduzieren».
+
 ## 1.42.0 (11.11.2026)
 
 - `punktfeld` wolke mit `data-ziel` (CSS-Auswahl, Runde 116): Beim Weiterscrollen fliessen die Punkte der Wolke in das Zielelement (z. B. das Feld im blauen Band) und bilden dort das Diagonal-Band 45°. Die Leinwand liegt dafür fest über dem Fenster. Bei «Bewegung reduzieren» ohne Wirkung.
