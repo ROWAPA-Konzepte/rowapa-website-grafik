@@ -84,6 +84,10 @@ Prüfwerkzeuge: `pruefung/messen.js` (Ladezeit, Datenmenge), `pruefung/rechenlas
 - Start erst nach dem Laden der Seite; jede Grafik rechnet nur, solange sie sichtbar ist. Ab 1.27.0 warten die Grafiken zusätzlich, solange die Seite im Hintergrund vorgeladen wird oder beim Seitenwechsel noch einfährt (`html[data-rg-wechsel]`, gesetzt vom Kopf-Skript «ROWAPASeitenwechsel» ab 1.1.0, ab 1.2.0 bei jedem Seitenwechsel); bis dahin stehen die Standbilder.
 - Werkzeuge zum Neuerzeugen der Standbilder (Punktfiguren, Treppe, Kugel, Symbole): Ordner [`figuren/`](figuren/LIESMICH.md).
 
+## 1.38.1 (11.11.2026)
+
+- `punktemeer`: ein `data-meer` direkt am Behälter geht der Adresse `?meer=` vor (so kann ein Band mitten auf der Seite ein volles Meer mit Netz zeigen, während der Header ruhig bleibt). Header und Startseite unverändert.
+
 ## 1.38.0 (11.11.2026)
 
 - Neues Modul `punktfeld` (Runde 111): Punktfelder ohne Bild, scroll-gekoppelt (0 = Oberkante unten im Bild, 1 = bei 15 % der Fensterhöhe), leichtes Atmen nur ohne «Bewegung reduzieren». Formen wolke, band, sammeln.

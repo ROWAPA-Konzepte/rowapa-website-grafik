@@ -65,6 +65,9 @@ function shader(gl, typ, src) {
 }
 
 function meerModus(box) {
+  /* eigenes Attribut am Behälter geht vor (z. B. Band mit vollem Meer und Netz), dann Adresse, dann Vorfahre */
+  const eigen = (box.getAttribute('data-meer') || '').trim().toLowerCase();
+  if (eigen === 'voll' || eigen === 'ruhig') return eigen;
   let w = '';
   try { w = new URLSearchParams(location.search).get('meer') || ''; } catch (e) { /* alte Browser */ }
   if (!w) { const el = box.closest('[data-meer]'); w = el ? el.getAttribute('data-meer') : ''; }
