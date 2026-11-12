@@ -58,3 +58,18 @@ NODE_PATH=$(npm root -g) node figuren/hebel.js   # roh-hebel-NAME-hell.png / -du
 
 Danach auf den Inhalt zuschneiden, auf 1100 px Breite verkleinern und auf 64 Farben reduzieren (PNG mit Transparenz, 51–79 KB) → `hebel/grafik-hebel-NAME-PAL.png`.
 In Webflow unter Assets › «02 Grafiken», im CMS «Hebel» in den Feldern «Motiv für helle Karten» und «Motiv für dunkle Karten». Welches Bild sichtbar ist, steuern die Theme-Variablen «Motiv für hellen Grund» und «Motiv für dunklen Grund» (Deckkraft je Modus).
+
+## Punktbilder Mitarbeiterperformance (Runde 128)
+
+Eigene Bilder im Stil des Bildkatalogs, gezeichnet mit `figuren/punktbilder.py`. Die Motive sind dort als Formen beschrieben (Striche, Flächen, Plum-Akzent) und werden in Punkte umgesetzt: dichte Punkte auf den Strichen, lockere Füllung, die nach unten ausläuft, links ein Zerfall in Plum und Sea Cliff.
+
+```
+python3 figuren/punktbilder.py figuren/mitarbeiterperformance            # alle
+python3 figuren/punktbilder.py figuren/mitarbeiterperformance mp-szene-platz   # nur eines
+```
+
+- `mp-header-potenzial` (1000 × 624, hell auf dunklem Header): Person mit Funken und Entwicklungsweg in Plum.
+- Hebel (408 × 408): `-hell` für helle Karten (1, 3, 5), `-frei` für dunkle Karten (2, 4): Motivation (Flamme), Diagnostik (Lupe mit Person), Talent (Treppe mit Stern), Gesundheit (Herz mit Puls), Coaching (zwei Personen, Weg nach vorn).
+- Szenen der Herausforderungen (408 × 408, Sea Cliff auf Weiss): Platz (Stellenraster mit leerem Platz), Giesskanne, Talente (Stufen mit leerer oberster Stufe), Zahlen (Person und fallende Balken).
+
+Ein neues Motiv: Funktion nach dem Muster der bestehenden schreiben und in `BILDER` eintragen.
