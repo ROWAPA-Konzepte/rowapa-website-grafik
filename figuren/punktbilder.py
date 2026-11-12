@@ -31,7 +31,7 @@ PALETTEN = {
              "zerfall": [PLUM, SERPENT, SEACLIFF, MANGANESE], "akzent": [PLUM, (150, 15, 70)]},
     "frei": {"strich": [SEACLIFF, (190, 216, 236), WEISS], "flaeche": [SEACLIFF, (126, 168, 206), WEISS],
              "zerfall": [PLUM_HELL, PLUM, WEISS, SEACLIFF], "akzent": [PLUM_HELL, (226, 90, 146)]},
-    "szene": {"strich": [(112, 156, 204), (140, 182, 220), SERPENT], "flaeche": [SEACLIFF, (186, 212, 234), (130, 172, 214)],
+    "szene": {"strich": [SERPENT, (58, 90, 134), (96, 134, 182)], "flaeche": [(120, 162, 206), SEACLIFF, SERPENT],
               "zerfall": [PLUM, PLUM_HELL, SEACLIFF, SERPENT], "akzent": [PLUM, PLUM_HELL]},
 }
 
@@ -395,16 +395,18 @@ def header():
     return m
 
 
+SZ = {"strich_abstand": 2.7, "r_strich": (1.05, 2.0), "r_flaeche": (0.7, 1.35)}
+
 BILDER = [
     ("mp-hebel-motivation-hell", hebel_motivation, "hell", {}),
     ("mp-hebel-diagnostik-frei", hebel_diagnostik, "frei", {}),
     ("mp-hebel-talent-hell", hebel_talent, "hell", {}),
     ("mp-hebel-gesundheit-frei", hebel_gesundheit, "frei", {}),
     ("mp-hebel-coaching-hell", hebel_coaching, "hell", {}),
-    ("mp-szene-platz", szene_platz, "szene", {}),
-    ("mp-szene-giesskanne", szene_giesskanne, "szene", {}),
-    ("mp-szene-talente", szene_talente, "szene", {}),
-    ("mp-szene-zahlen", szene_zahlen, "szene", {}),
+    ("mp-szene-platz", szene_platz, "szene", SZ),
+    ("mp-szene-giesskanne", szene_giesskanne, "szene", SZ),
+    ("mp-szene-talente", szene_talente, "szene", SZ),
+    ("mp-szene-zahlen", szene_zahlen, "szene", SZ),
     ("mp-header-potenzial", header, "frei", {"strich_abstand": 3.6, "flaeche_abstand": 6.0, "r_strich": (1.4, 2.8), "r_flaeche": (1.0, 2.0), "auslauf": (0.35, 0.95)}),
 ]
 
