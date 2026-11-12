@@ -2,7 +2,8 @@
    An der Liste: data-grafik="fortschritt". Einträge: die direkten Kinder mit der Klasse aus data-eintrag (Standard
    «philo_item»). Ein Eintrag ist aktiv (Klasse is-aktiv), bis der nächste mit seiner Oberkante die Fenstermitte erreicht;
    frühere erhalten is-vorbei. Die Linie: ein Element mit data-fortschritt-linie in der Liste; das Modul skaliert es von oben
-   (scaleY 0–1) mit dem Scrollen. Bei «Bewegung reduzieren» ist die Linie voll, die Aktiv-Regel gilt weiter. */
+   (scaleY 0–1) mit dem Scrollen. Ab 1.50.0 erhalten auch Elemente im Eintrag mit data-fortschritt-mit (Titel, Satz,
+   Punkt) dieselben Klassen, damit ihre Aktiv-Stile als Webflow-Kombiklassen gepflegt werden können. Bei «Bewegung reduzieren» ist die Linie voll, die Aktiv-Regel gilt weiter. */
 import { clamp, reduziert, takt } from './util.js';
 
 export function fortschritt(el) {
@@ -20,7 +21,9 @@ export function fortschritt(el) {
     items.forEach((it, i) => { if (it.getBoundingClientRect().top < vh * 0.5) akt = i; });
     if (akt !== alt) {
       alt = akt;
-      items.forEach((it, i) => { it.classList.toggle('is-aktiv', i === akt); it.classList.toggle('is-vorbei', i < akt); });
+      items.forEach((it, i) => {
+        [it, ...it.querySelectorAll('[data-fortschritt-mit]')].forEach(t => { t.classList.toggle('is-aktiv', i === akt); t.classList.toggle('is-vorbei', i < akt); });
+      });
     }
     if (linie) {
       const p = ruhig ? 1 : clamp((vh * 0.62 - r.top) / Math.max(1, r.height * 0.9), 0, 1);

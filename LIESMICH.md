@@ -84,6 +84,10 @@ Prüfwerkzeuge: `pruefung/messen.js` (Ladezeit, Datenmenge), `pruefung/rechenlas
 - Start erst nach dem Laden der Seite; jede Grafik rechnet nur, solange sie sichtbar ist. Ab 1.27.0 warten die Grafiken zusätzlich, solange die Seite im Hintergrund vorgeladen wird oder beim Seitenwechsel noch einfährt (`html[data-rg-wechsel]`, gesetzt vom Kopf-Skript «ROWAPASeitenwechsel» ab 1.1.0, ab 1.2.0 bei jedem Seitenwechsel); bis dahin stehen die Standbilder.
 - Werkzeuge zum Neuerzeugen der Standbilder (Punktfiguren, Treppe, Kugel, Symbole): Ordner [`figuren/`](figuren/LIESMICH.md).
 
+## 1.50.0 (12.11.2026)
+- staffel: `data-staffel-handy` setzt bis 767 px einen eigenen Modus (Herausforderungen: «einmal», Entscheid 440).
+- fortschritt: Elemente mit `data-fortschritt-mit` im Eintrag erhalten ebenfalls `is-aktiv` / `is-vorbei` (Philosophie: Titel, Satz, Punkt als Webflow-Kombiklassen).
+
 ## 1.45.0 (11.11.2026)
 
 - `aufloesen` (Runde 119): Das Bild bleibt scharf, während sich die Punkte lösen; die Punkte erscheinen erst ausserhalb des Bildes, das Bild blendet danach aus. Zurück folgt die Bewegung rasch (0,12 s statt 0,45 s), damit die Bilder schnell wieder scharf stehen.
