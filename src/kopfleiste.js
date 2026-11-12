@@ -9,8 +9,9 @@
    Elemente mit data-kopfleiste-folgt (z. B. eine klebende Leiste unter der Navigation) rücken mit nach oben.
    Bleibt sichtbar: am Seitenanfang (unter 10 px), solange ein Menü offen ist oder die Navigation den Tastatur-Fokus hat.
    Bei «Bewegung reduzieren» ohne Gleiten.
-   Ab 1.47.0 (Entscheid 440): Auf dem Handy (bis 767 px) bleibt die Navigation immer stehen, sie trägt dort den Button
-   «Erstgespräch». Mit data-kopfleiste-fest="immer" bleibt sie auf allen Breiten stehen, mit "nie" gilt das alte Verhalten.
+   Ab 1.47.0: data-kopfleiste-fest="immer" hält sie auf allen Breiten fest, "handy" nur bis 767 px.
+   Ab 1.48.0 (Entscheid 441): Standard "nie", also auf allen Breiten gleich wie auf dem Desktop: beim Runterscrollen aus,
+   beim Hochscrollen ein. Auf dem Handy genügen dafür 60 px Hochscrollen (data-kopfleiste-zurueck-handy, Standard 60).
 
    Ab 1.23.0 bewegt das Modul die CSS-Eigenschaft «translate» (Web Animations), nicht «transform». So bleibt es unabhängig
    von der Themen-Bühne der Startseite, die die Navigation über «transform» ausblendet. Nach dem Einblenden ist die
@@ -24,7 +25,9 @@ export function kopfleiste(el) {
   if (!nav || nav.dataset.kopfleisteAktiv) return;
   nav.dataset.kopfleisteAktiv = 'ja';
   const ab = zahl(el, 'data-kopfleiste-ab', 200);
-  const zurueck = Math.max(0, zahl(el, 'data-kopfleiste-zurueck', 200));
+  const zurueckGross = Math.max(0, zahl(el, 'data-kopfleiste-zurueck', 200));
+  const zurueckHandy = Math.max(0, zahl(el, 'data-kopfleiste-zurueck-handy', 60));
+  const handy = matchMedia('(max-width: 767px)');
   const folger = () => [...document.querySelectorAll('[data-kopfleiste-folgt]')];
   const laufend = new Map();
 
@@ -61,7 +64,7 @@ export function kopfleiste(el) {
     folger().forEach(f => bewegen(f, an ? null : `0px ${-hoehe}px`));
   }
 
-  const fest = (el.getAttribute('data-kopfleiste-fest') || 'handy').trim().toLowerCase();
+  const fest = (el.getAttribute('data-kopfleiste-fest') || 'nie').trim().toLowerCase();
   const steht = () => fest === 'immer' || (fest === 'handy' && matchMedia('(max-width: 767px)').matches);
 
   function pruefen() {
@@ -73,7 +76,7 @@ export function kopfleiste(el) {
     letzte = y;
     if (y < 10 || offen()) { zeigen(true); return; }
     if (richtung > 0 && y > ab) zeigen(false);
-    else if (richtung < 0 && wende - y >= zurueck) zeigen(true);
+    else if (richtung < 0 && wende - y >= (handy.matches ? zurueckHandy : zurueckGross)) zeigen(true);
   }
 
   addEventListener('scroll', () => {
