@@ -12,6 +12,8 @@
 import { reduziert, clamp, easeInOut, sobaldNahe, ciFarbe, takt } from './util.js';
 
 const JE_BILD = 650;
+/* ab 1.47.0: auf dem Handy die Hälfte (kleine Bilder, ältere Geräte; Entscheid 440) */
+const jeBild = () => (matchMedia('(max-width: 767px)').matches ? 325 : JE_BILD);
 
 function zufall(seed) {
   let s = seed >>> 0 || 1;
@@ -60,7 +62,7 @@ function abtasten(bild, zz) {
   }
   if (!kand.length) return null;
   const out = [];
-  for (let n = 0; n < JE_BILD; n++) out.push(kand[Math.floor(zz() * kand.length)]);
+  for (let n = 0, N = jeBild(); n < N; n++) out.push(kand[Math.floor(zz() * kand.length)]);
   return out;
 }
 

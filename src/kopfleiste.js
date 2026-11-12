@@ -9,6 +9,8 @@
    Elemente mit data-kopfleiste-folgt (z. B. eine klebende Leiste unter der Navigation) rücken mit nach oben.
    Bleibt sichtbar: am Seitenanfang (unter 10 px), solange ein Menü offen ist oder die Navigation den Tastatur-Fokus hat.
    Bei «Bewegung reduzieren» ohne Gleiten.
+   Ab 1.47.0 (Entscheid 440): Auf dem Handy (bis 767 px) bleibt die Navigation immer stehen, sie trägt dort den Button
+   «Erstgespräch». Mit data-kopfleiste-fest="immer" bleibt sie auf allen Breiten stehen, mit "nie" gilt das alte Verhalten.
 
    Ab 1.23.0 bewegt das Modul die CSS-Eigenschaft «translate» (Web Animations), nicht «transform». So bleibt es unabhängig
    von der Themen-Bühne der Startseite, die die Navigation über «transform» ausblendet. Nach dem Einblenden ist die
@@ -59,9 +61,13 @@ export function kopfleiste(el) {
     folger().forEach(f => bewegen(f, an ? null : `0px ${-hoehe}px`));
   }
 
+  const fest = (el.getAttribute('data-kopfleiste-fest') || 'handy').trim().toLowerCase();
+  const steht = () => fest === 'immer' || (fest === 'handy' && matchMedia('(max-width: 767px)').matches);
+
   function pruefen() {
     wartet = false;
     const y = scrollY;
+    if (steht()) { zeigen(true); letzte = y; return; }
     const r = Math.sign(y - letzte);
     if (r && r !== richtung) { richtung = r; wende = letzte; }
     letzte = y;
