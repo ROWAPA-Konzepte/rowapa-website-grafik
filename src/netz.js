@@ -31,6 +31,15 @@ export function netzStufe(box, art) {
   return STUFEN[w] ? w : null;
 }
 
+/* Ab 1.46.0: Netz auch im ruhigen Meer, aber nur wenn es ausdrücklich verlangt ist (?netz=… oder data-netz am Element
+   oder darüber). So bleibt das ruhige Meer der Unterseiten ohne Netz, die Startseite kann ruhiges Meer mit Netz zeigen. */
+export function netzAusdruecklich(box, art) {
+  let w = '';
+  try { w = new URLSearchParams(location.search).get('netz') || ''; } catch (e) { /* alte Browser */ }
+  if (!w && !box.closest('[data-netz]')) return null;
+  return netzStufe(box, art);
+}
+
 /* Wellenhöhe wie im Vertex-Shader des Punktemeers */
 function welle(x, z, t) {
   return Math.sin(x * 0.22 + t * 0.5) * 0.5 + Math.sin(z * 0.3 - t * 0.65) * 0.42 +

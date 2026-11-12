@@ -6,7 +6,7 @@
    opt.dauer = Einblendzeit in Sekunden (Standard 1,4), opt.bereit(live) = wird beim ersten gezeichneten Bild mit true
    aufgerufen, ohne WebGL sofort mit false. */
 import { clamp, lerp, easeInOut, zahl, farbe, sichtbar, takt, istHandy } from './util.js';
-import { netz, netzStufe } from './netz.js';
+import { netz, netzStufe, netzAusdruecklich } from './netz.js';
 
 const VS = `
 attribute vec3 aP;
@@ -97,9 +97,9 @@ export function punktemeer(box, art, opt = {}) {
   gl.useProgram(pr);
   box.appendChild(ebene);
   /* Ab 1.34.0: ruhiges Meer für Unterseiten (data-meer="ruhig" am Element oder darüber, zum Vergleichen ?meer=ruhig|voll):
-     halbe Wellenhöhe, 70 % Tempo, kein Netz */
+     halbe Wellenhöhe, 70 % Tempo, kein Netz. Ab 1.46.0 mit Netz, wenn data-netz gesetzt ist (Startseite, Entscheid 438). */
   const ruhig = art === 'punktemeer' && meerModus(box) === 'ruhig';
-  const stufe = ruhig ? null : netzStufe(box, art);
+  const stufe = ruhig ? netzAusdruecklich(box, art) : netzStufe(box, art);
   if (window.ROWAPAGrafik && art === 'punktemeer') { window.ROWAPAGrafik.netz = stufe || 'aus'; window.ROWAPAGrafik.meer = ruhig ? 'ruhig' : 'voll'; }
 
   /* Punktfeld: 70 × 70 Einheiten, auf dem Handy weniger Punkte */
