@@ -2,7 +2,8 @@
    Aufbau in Webflow: ein Behälter mit data-grafik="laufband" (overflow hidden), darin die Spur (erstes Kind, Flex-Reihe),
    darin die Logos, z. B. eine Collection-Liste aus «Unternehmen & Partner». Das Modul setzt so viele Kopien der Logos
    hintereinander, dass die Spur breiter ist als Fenster plus ein Satz, und verschiebt sie um genau einen Satz.
-   data-tempo: Pixel pro Sekunde (Standard 40). Bei «Bewegung reduzieren» läuft das Modul nicht, die Logos stehen. */
+   data-tempo: Pixel pro Sekunde (Standard 40). data-bildklasse (ab 1.51.0): Klasse(n) der laufenden Logos statt der
+   Klassen der Vorlage, z. B. wenn die Logos aus der Komponente «Logo-Leiste» kommen und im Band kleiner stehen. Bei «Bewegung reduzieren» läuft das Modul nicht, die Logos stehen. */
 import { clamp, zahl } from './util.js';
 
 export function laufband(el) {
@@ -14,7 +15,8 @@ export function laufband(el) {
   const tempo = clamp(zahl(el, 'data-tempo', 40), 5, 200);
   /* flache Spur: alle Bilder direkt in die Spur, Collection-Hüllen bleiben leer stehen und werden ausgeblendet */
   const huellen = [...spur.children];
-  const satz = vorlage.map(img => { const c = img.cloneNode(true); c.removeAttribute('loading'); return c; });
+  const klasse = (el.getAttribute('data-bildklasse') || '').trim();
+  const satz = vorlage.map(img => { const c = img.cloneNode(true); c.removeAttribute('loading'); if (klasse) c.className = klasse; return c; });
   huellen.forEach(h => { h.style.display = 'none'; h.setAttribute('aria-hidden', 'true'); });
   let n = 0;
   const kopie = () => {
