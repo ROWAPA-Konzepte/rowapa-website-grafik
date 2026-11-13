@@ -395,6 +395,157 @@ def header():
     return m
 
 
+# ---------------------------------------------------------------- Führung & Teams (Runde 129)
+
+def fu_header():
+    m = Motiv(1000, 624)
+    # Führungsperson vorn, zwei Teammitglieder dahinter, gemeinsamer Weg nach oben
+    m.person(200, 170, s=2.0, w=6)
+    m.person(640, 170, s=2.0, w=6)
+    m.person(420, 70, s=2.6, w=7)
+    def bahn(t):
+        return 720 + 220 * t, 300 - 240 * (t ** 1.5)
+    pts = [bahn(i / 60) for i in range(61)]
+    for i in range(0, 60, 2):
+        m.linie([pts[i], pts[i + 1]], 9, "akzent")
+    for t in (0.35, 0.7):
+        x, y = bahn(t)
+        m.kreis(x, y, 15, w=6, ebene="akzent")
+    ex, ey = pts[-1]
+    m.poly([(ex + 22, ey - 32), (ex - 26, ey - 8), (ex + 14, ey + 22)], w=4, ebene="akzent", fuellen="akzent_flaeche")
+    return m
+
+
+def fu_hebel_kompetenz():
+    m = Motiv(408, 408)
+    m.person(180, 110, s=1.0)
+    # Abzeichen mit Stern an der Brust
+    cx, cy, ra, ri = 268, 270, 30, 13
+    stern = []
+    for i in range(10):
+        a = math.radians(-90 + i * 36)
+        r = ra if i % 2 == 0 else ri
+        stern.append((cx + r * math.cos(a), cy + r * math.sin(a)))
+    m.kreis(cx, cy, 44, w=4, ebene="akzent")
+    m.poly(stern, w=3, ebene="akzent", fuellen="akzent_flaeche")
+    return m
+
+
+def fu_hebel_team():
+    m = Motiv(408, 408)
+    pos = [(204, 96), (96, 210), (312, 210), (150, 320), (258, 320)]
+    for i, (x, y) in enumerate(pos):
+        for (x2, y2) in pos[i + 1:]:
+            m.linie([(x, y), (x2, y2)], 2.5, "strich")
+    for i, (x, y) in enumerate(pos):
+        m.kreis(x, y, 34, w=5, fuellen="flaeche")
+        m.bogen(x, y + 8, 12, 9, 25, 155, 3)
+    m.kreis(204, 96, 34, w=5, ebene="akzent")
+    return m
+
+
+def fu_hebel_diagnose():
+    m = Motiv(408, 408)
+    # Netzdiagramm mit Profil in Plum
+    cx, cy, r = 204, 210, 140
+    n = 6
+    for ring in (0.35, 0.7, 1.0):
+        pts = [(cx + r * ring * math.cos(math.radians(-90 + i * 60)), cy + r * ring * math.sin(math.radians(-90 + i * 60))) for i in range(n)]
+        m.poly(pts, w=3 if ring < 1 else 5)
+    for i in range(n):
+        a = math.radians(-90 + i * 60)
+        m.linie([(cx, cy), (cx + r * math.cos(a), cy + r * math.sin(a))], 2.5)
+    werte = [0.9, 0.55, 0.75, 0.45, 0.85, 0.6]
+    prof = [(cx + r * v * math.cos(math.radians(-90 + i * 60)), cy + r * v * math.sin(math.radians(-90 + i * 60))) for i, v in enumerate(werte)]
+    m.poly(prof, w=6, ebene="akzent", fuellen="flaeche")
+    for x, y in prof:
+        m.kreis(x, y, 8, w=0, fuellen="akzent_flaeche")
+    return m
+
+
+def fu_hebel_motivation():
+    m = Motiv(408, 408)
+    m.person(204, 150, s=0.95)
+    # Strahlen nach oben: Antrieb geben
+    for a in (-60, -30, 0, 30, 60):
+        ra = math.radians(a - 90)
+        x0, y0 = 204 + 120 * math.cos(ra), 182 + 120 * math.sin(ra)
+        x1, y1 = 204 + 165 * math.cos(ra), 182 + 165 * math.sin(ra)
+        m.linie([(x0, y0), (x1, y1)], 7, "akzent")
+    return m
+
+
+def fu_hebel_sparring():
+    m = Motiv(408, 408)
+    # Zwei Personen im Profil, einander zugewandt, dazwischen Sprechblase
+    def profil(cx, top, s, richtung):
+        rk = 34 * s
+        m.kreis(cx, top + rk, rk, w=5, fuellen="flaeche")
+        hals = top + 2 * rk
+        pts = [(cx - 70 * s * richtung, hals + 110 * s), (cx - 60 * s * richtung, hals + 30 * s), (cx, hals + 12 * s), (cx + 60 * s * richtung, hals + 30 * s), (cx + 70 * s * richtung, hals + 110 * s)]
+        m.poly(pts, w=0, fuellen="flaeche")
+        m.linie(pts, 5)
+    profil(110, 130, 0.9, 1)
+    profil(298, 130, 0.9, -1)
+    m.rechteck(160, 50, 248, 104, w=4, ebene="akzent", radius=14)
+    m.poly([(196, 104), (214, 104), (200, 122)], w=3, ebene="akzent", fuellen="akzent_flaeche")
+    return m
+
+
+def fu_szene_hybrid():
+    m = Motiv(408, 408)
+    # Bildschirm mit Person, davor eine Person: Nähe auf Distanz
+    m.rechteck(170, 70, 380, 230, w=5, radius=8)
+    m.linie([(250, 230), (300, 230)], 4)
+    m.linie([(240, 262), (310, 262)], 5)
+    m.linie([(275, 232), (275, 262)], 5)
+    m.person(275, 100, s=0.55, w=3)
+    m.person(110, 180, s=0.82)
+    # Verbindung (Wellen) in Plum
+    for r in (22, 36, 50):
+        m.bogen(178, 200, r, r, -40, 40, 3.5, "akzent", n=20)
+    return m
+
+
+def fu_szene_einzel():
+    m = Motiv(408, 408)
+    # Ein Einzelkämpfer weit vorn, die anderen getrennt dahinter
+    m.person(320, 120, s=0.8)
+    for x in (60, 150):
+        m.person(x, 210, s=0.58, w=3)
+    m.linie([(20, 352), (390, 352)], 4)
+    # Lücke in Plum zwischen Team und Einzelkämpfer
+    for k in range(5):
+        y = 150 + k * 40
+        m.linie([(236, y), (236, y + 18)], 4, "akzent")
+    return m
+
+
+def fu_szene_messen():
+    m = Motiv(408, 408)
+    # Zielscheibe, Pfeile daneben: Massnahmen ohne Messung
+    for r in (130, 92, 54):
+        m.kreis(204, 200, r, w=4)
+    m.kreis(204, 200, 18, w=0, fuellen="akzent_flaeche")
+    for (x, y, a) in ((70, 70, 35), (360, 110, 150), (330, 350, 220)):
+        ra = math.radians(a)
+        m.linie([(x, y), (x + 70 * math.cos(ra), y + 70 * math.sin(ra))], 5, "akzent")
+        m.poly([(x, y), (x + 18 * math.cos(ra + 0.5), y + 18 * math.sin(ra + 0.5)), (x + 18 * math.cos(ra - 0.5), y + 18 * math.sin(ra - 0.5))], w=3, ebene="akzent", fuellen="akzent_flaeche")
+    return m
+
+
+def fu_szene_spitze():
+    m = Motiv(408, 408)
+    # Oberste Stufe: Führungsperson mit Gegenüber im Gespräch
+    pts = [(20, 360), (90, 360), (90, 300), (170, 300), (170, 240), (400, 240)]
+    m.linie(pts, 4)
+    m.person(230, 96, s=0.62)
+    m.person(340, 108, s=0.55, w=3)
+    m.rechteck(262, 34, 318, 72, w=3.5, ebene="akzent", radius=10)
+    m.poly([(284, 72), (296, 72), (286, 86)], w=3, ebene="akzent", fuellen="akzent_flaeche")
+    return m
+
+
 SZ = {"strich_abstand": 2.7, "r_strich": (1.05, 2.0), "r_flaeche": (0.7, 1.35)}
 
 BILDER = [
@@ -407,6 +558,16 @@ BILDER = [
     ("mp-szene-giesskanne", szene_giesskanne, "szene", SZ),
     ("mp-szene-talente", szene_talente, "szene", SZ),
     ("mp-szene-zahlen", szene_zahlen, "szene", SZ),
+    ("fu-header-fuehrung", fu_header, "frei", {"strich_abstand": 3.6, "flaeche_abstand": 6.0, "r_strich": (1.4, 2.8), "r_flaeche": (1.0, 2.0), "auslauf": (0.35, 0.95)}),
+    ("fu-hebel-kompetenz-hell", fu_hebel_kompetenz, "hell", {}),
+    ("fu-hebel-team-frei", fu_hebel_team, "frei", {}),
+    ("fu-hebel-diagnose-hell", fu_hebel_diagnose, "hell", {}),
+    ("fu-hebel-motivation-frei", fu_hebel_motivation, "frei", {}),
+    ("fu-hebel-sparring-hell", fu_hebel_sparring, "hell", {}),
+    ("fu-szene-hybrid", fu_szene_hybrid, "szene", SZ),
+    ("fu-szene-einzel", fu_szene_einzel, "szene", SZ),
+    ("fu-szene-messen", fu_szene_messen, "szene", SZ),
+    ("fu-szene-spitze", fu_szene_spitze, "szene", SZ),
     ("mp-header-potenzial", header, "frei", {"strich_abstand": 3.6, "flaeche_abstand": 6.0, "r_strich": (1.4, 2.8), "r_flaeche": (1.0, 2.0), "auslauf": (0.35, 0.95)}),
 ]
 

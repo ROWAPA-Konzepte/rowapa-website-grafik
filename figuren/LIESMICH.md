@@ -73,3 +73,23 @@ python3 figuren/punktbilder.py figuren/mitarbeiterperformance mp-szene-platz   #
 - Szenen der Herausforderungen (408 × 408, Sea Cliff auf Weiss): Platz (Stellenraster mit leerem Platz), Giesskanne, Talente (Stufen mit leerer oberster Stufe), Zahlen (Person und fallende Balken).
 
 Ein neues Motiv: Funktion nach dem Muster der bestehenden schreiben und in `BILDER` eintragen.
+
+## Punktbilder Führung & Teams (Runde 129)
+
+Gleicher Generator, Präfix `fu-`, Ordner `figuren/fuehrung/`:
+- Header: drei Personen mit Weg nach oben.
+- Hebel:
+  - Kompetenzen: Person mit Abzeichen
+  - Team: Netz aus fünf Köpfen
+  - Diagnose: Netzdiagramm mit Profil
+  - Motivation: Person mit Strahlen
+  - Sparring: zwei Personen im Gespräch
+- Szenen:
+  - Hybrid: Bildschirm und Person
+  - Einzelkämpfer: Lücke zum Team
+  - Messen: Pfeile neben der Zielscheibe
+  - Spitze: Gespräch auf der obersten Stufe
+
+```
+python3 figuren/punktbilder.py figuren/fuehrung fu-header-fuehrung fu-hebel-kompetenz-hell …
+```
