@@ -546,6 +546,131 @@ def fu_szene_spitze():
     return m
 
 
+# ---------------------------------------------------------------- Recruiting & Mitarbeiterbindung (Runde 130)
+
+def re_header():
+    m = Motiv(1000, 624)
+    # Lebenszyklus: Ring mit vier Stationen, Person in der Mitte, Pfeile im Uhrzeigersinn
+    cx, cy, r = 520, 312, 250
+    for a0 in (200, 290, 20, 110):
+        m.bogen(cx, cy, r, r, a0 + 13, a0 + 77, 11)
+        a1 = math.radians(a0 + 78)
+        ex, ey = cx + r * math.cos(a1), cy + r * math.sin(a1)
+        t = a1 + math.pi / 2
+        m.poly([(ex + 28 * math.cos(t), ey + 28 * math.sin(t)), (ex - 24 * math.cos(a1 - 0.6), ey - 24 * math.sin(a1 - 0.6)), (ex + 24 * math.cos(a1 + 0.6), ey + 24 * math.sin(a1 + 0.6))], w=6, fuellen="flaeche")
+    for i, a in enumerate((200, 290, 20, 110)):
+        x, y = cx + r * math.cos(math.radians(a)), cy + r * math.sin(math.radians(a))
+        m.kreis(x, y, 38, w=8, ebene="akzent" if i == 3 else "strich", fuellen="akzent_flaeche" if i == 3 else "flaeche")
+    m.person(cx, 196, s=1.6, w=7)
+    return m
+
+
+def re_hebel_recruiting():
+    m = Motiv(408, 408)
+    # Magnet zieht Personen an
+    m.bogen(130, 170, 70, 70, 90, 270, 18)
+    m.linie([(130, 100), (190, 100)], 18)
+    m.linie([(130, 240), (190, 240)], 18)
+    m.linie([(176, 100), (204, 100)], 18, "akzent")
+    m.linie([(176, 240), (204, 240)], 18, "akzent")
+    m.person(320, 110, s=0.55, w=3)
+    m.person(300, 250, s=0.45, w=3)
+    for k in range(3):
+        m.bogen(232, 170, 18 + k * 14, 30 + k * 14, -50, 50, 3, "akzent", n=12)
+    return m
+
+
+def re_hebel_onboarding():
+    m = Motiv(408, 408)
+    # Weg mit drei Etappen 30, 60, 90 Tage und Ziel
+    pts = [(40, 320), (130, 300), (180, 240), (260, 220), (300, 160), (370, 120)]
+    for i in range(len(pts) - 1):
+        for k in range(0, 8, 2):
+            a, b = k / 8, (k + 1) / 8
+            (x0, y0), (x1, y1) = pts[i], pts[i + 1]
+            m.linie([(x0 + (x1 - x0) * a, y0 + (y1 - y0) * a), (x0 + (x1 - x0) * b, y0 + (y1 - y0) * b)], 6)
+    for (x, y) in (pts[1], pts[3], pts[4]):
+        m.kreis(x, y, 18, w=5, fuellen="flaeche")
+    m.linie([(370, 120), (370, 50)], 5, "akzent")
+    m.poly([(370, 50), (410, 64), (370, 80)], w=3, ebene="akzent", fuellen="akzent_flaeche")
+    m.person(70, 196, s=0.55, w=3)
+    return m
+
+
+def re_hebel_bindung():
+    m = Motiv(408, 408)
+    # Anker
+    m.kreis(204, 86, 26, w=7)
+    m.linie([(204, 112), (204, 330)], 9)
+    m.linie([(150, 160), (258, 160)], 9)
+    m.bogen(204, 250, 120, 90, 10, 170, 9)
+    for x, d in ((86, -1), (322, 1)):
+        m.poly([(x, 266), (x + 34 * d, 252), (x + 6 * d, 236)], w=4, ebene="akzent", fuellen="akzent_flaeche")
+    return m
+
+
+def re_szene_bewerbung():
+    m = Motiv(408, 408)
+    # Wartereihe: fünf Stühle, nur einer besetzt
+    for i in range(5):
+        x = 40 + i * 70
+        m.linie([(x, 300), (x + 50, 300)], 4)
+        m.linie([(x + 4, 300), (x + 4, 350)], 3)
+        m.linie([(x + 46, 300), (x + 46, 350)], 3)
+        m.linie([(x + 4, 300), (x + 4, 240)], 3)
+    m.person(205, 150, s=0.62, w=3)
+    m.rechteck(290, 60, 380, 130, w=3.5, ebene="akzent", radius=8)
+    m.linie([(304, 84), (366, 84)], 3, "akzent")
+    m.linie([(304, 104), (346, 104)], 3, "akzent")
+    return m
+
+
+def re_szene_einarbeitung():
+    m = Motiv(408, 408)
+    # Sanduhr neben einer Person am Pult
+    m.poly([(250, 70), (350, 70), (300, 190)], w=4)
+    m.poly([(300, 190), (250, 310), (350, 310)], w=4, fuellen="flaeche")
+    m.linie([(236, 70), (364, 70)], 6)
+    m.linie([(236, 310), (364, 310)], 6)
+    for k in range(6):
+        m.kreis(300, 200 + k * 14, 3, w=0, fuellen="akzent_flaeche")
+    m.person(110, 140, s=0.72)
+    return m
+
+
+def re_szene_perspektive():
+    m = Motiv(408, 408)
+    # Weg endet vor einer Wand, Person davor
+    m.linie([(20, 340), (300, 340)], 4)
+    for k in range(5):
+        y = 120 + k * 46
+        m.linie([(310, y), (390, y)], 4)
+        m.linie([(350 if k % 2 else 330, y), (350 if k % 2 else 330, y + 46)], 3)
+    m.rechteck(310, 120, 390, 340, w=4, radius=2)
+    m.person(200, 150, s=0.7)
+    m.bogen(250, 120, 22, 22, 200, 400, 4, "akzent", n=20)
+    m.kreis(258, 160, 3.5, w=0, fuellen="akzent_flaeche")
+    return m
+
+
+def re_szene_abwerben():
+    m = Motiv(408, 408)
+    # Person geht aus der eigenen Tür zu einem anderen Gebäude
+    m.rechteck(30, 110, 150, 340, w=4, radius=2)
+    m.rechteck(70, 230, 110, 340, w=3, radius=2)
+    m.poly([(290, 340), (290, 150), (340, 110), (390, 150), (390, 340)], w=4)
+    m.person(200, 180, s=0.5, w=3)
+    pts = [(150, 330), (220, 316), (280, 300)]
+    for i in range(0, 2):
+        (x0, y0), (x1, y1) = pts[i], pts[i + 1]
+        for k in range(0, 6, 2):
+            a, b = k / 6, (k + 1) / 6
+            m.linie([(x0 + (x1 - x0) * a, y0 + (y1 - y0) * a), (x0 + (x1 - x0) * b, y0 + (y1 - y0) * b)], 5, "akzent")
+    m.poly([(286, 298), (266, 288), (270, 310)], w=3, ebene="akzent", fuellen="akzent_flaeche")
+    m.linie([(20, 342), (396, 342)], 4)
+    return m
+
+
 SZ = {"strich_abstand": 2.7, "r_strich": (1.05, 2.0), "r_flaeche": (0.7, 1.35)}
 
 BILDER = [
@@ -568,6 +693,14 @@ BILDER = [
     ("fu-szene-einzel", fu_szene_einzel, "szene", SZ),
     ("fu-szene-messen", fu_szene_messen, "szene", SZ),
     ("fu-szene-spitze", fu_szene_spitze, "szene", SZ),
+    ("re-header-lebenszyklus", re_header, "frei", {"strich_abstand": 3.6, "flaeche_abstand": 6.0, "r_strich": (1.4, 2.8), "r_flaeche": (1.0, 2.0), "auslauf": (0.35, 0.95)}),
+    ("re-hebel-recruiting-hell", re_hebel_recruiting, "hell", {}),
+    ("re-hebel-onboarding-frei", re_hebel_onboarding, "frei", {}),
+    ("re-hebel-bindung-hell", re_hebel_bindung, "hell", {}),
+    ("re-szene-bewerbung", re_szene_bewerbung, "szene", SZ),
+    ("re-szene-einarbeitung", re_szene_einarbeitung, "szene", SZ),
+    ("re-szene-perspektive", re_szene_perspektive, "szene", SZ),
+    ("re-szene-abwerben", re_szene_abwerben, "szene", SZ),
     ("mp-header-potenzial", header, "frei", {"strich_abstand": 3.6, "flaeche_abstand": 6.0, "r_strich": (1.4, 2.8), "r_flaeche": (1.0, 2.0), "auslauf": (0.35, 0.95)}),
 ]
 

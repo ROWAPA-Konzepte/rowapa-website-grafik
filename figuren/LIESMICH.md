@@ -93,3 +93,17 @@ Gleicher Generator, Präfix `fu-`, Ordner `figuren/fuehrung/`:
 ```
 python3 figuren/punktbilder.py figuren/fuehrung fu-header-fuehrung fu-hebel-kompetenz-hell …
 ```
+
+## Punktbilder Recruiting & Mitarbeiterbindung (Runde 130)
+
+Präfix `re-`, Ordner `figuren/recruiting/`:
+- Header: Lebenszyklus als Ring mit vier Stationen und Person in der Mitte; die Station Bindung in Plum.
+- Hebel:
+  - Recruiting: Magnet zieht Personen an
+  - Onboarding: Weg mit drei Etappen und Ziel
+  - Bindung: Anker
+- Szenen:
+  - Wartereihe mit einem besetzten Stuhl
+  - Sanduhr
+  - Weg endet vor einer Wand
+  - Person geht zu einem anderen Gebäude
